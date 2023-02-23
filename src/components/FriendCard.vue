@@ -10,7 +10,7 @@
     </div>
 </template>
 <script setup>
-import { defineProps, ref, watch } from 'vue';
+import { defineProps } from 'vue';
 import Personal from '@/components/Personal.vue'
 const props = defineProps({
     chatFriendInfo: Object,

@@ -15,7 +15,10 @@
             </div>
         </div>
         <div class="chatRight">
-            <div class="showIcon">
+            <div v-if="showChatWindow">
+                <chatWindow :chatWindowInfo="chatWindowInfo"></chatWindow>
+            </div>
+            <div class="showIcon" v-else>
                 <img src="@/assets/img/index.png">
             </div>
         </div>
@@ -23,14 +26,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import FriendCard from '@/components/FriendCard.vue';
+import { ref, reactive } from 'vue'
+import FriendCard from '@/components/FriendCard.vue'
+import chatWindow from './chatWindow.vue'
 import chatFriendList from '@/hooks/chatFriendList'
 let chatList = chatFriendList()
 let preCurrent = ref('')
+let showChatWindow = ref(false)
+let chatWindowInfo = reactive({})
 const chooseChat = function (info) {
     this.preCurrent = info.id
+    this.showChatWindow = true
+    this.chatWindowInfo = info
 }
+
+
 
 </script>
 <style lang="less" scoped>
@@ -76,12 +86,17 @@ const chooseChat = function (info) {
     .chatRight {
         flex: 1;
         padding-right: 30px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
 
         .showIcon {
+            position: relative;
+            width: 100%;
+            height: 100%;
+
             img {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
                 width: 340px;
                 height: 340px;
                 color: rgb(117, 120, 137);
