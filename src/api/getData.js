@@ -1,5 +1,11 @@
 import $axios from "./index";
 
-export const getChatFriend = () => {
-    return $axios.post('friend/chatList').then(res => res.data)
+export const getChatFriend = async () => {
+    const res = await $axios.post('friend/chatList');
+    return res.data;
+}
+
+export const getChatMsg = async params => {
+    const res = await $axios.post('friend/chatMsg', { friendId: params.id });
+    return res.data;
 }

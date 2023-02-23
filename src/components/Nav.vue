@@ -34,7 +34,7 @@ const changeMenu = function (index) {
         ElMessage('开发中，敬请期待！')
         router.push('/')
     }
-    this.current = index;
+    current.value = index;
 }
 
 

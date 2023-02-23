@@ -9,5 +9,5 @@ export default function () {
         chatFriendList.push(...res)
     })
 
-    return chatFriendList;
+    return chatFriendList
 }

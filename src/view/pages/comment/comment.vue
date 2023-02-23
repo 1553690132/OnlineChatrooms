@@ -34,10 +34,10 @@ let chatList = chatFriendList()
 let preCurrent = ref('')
 let showChatWindow = ref(false)
 let chatWindowInfo = reactive({})
-const chooseChat = function (info) {
-    this.preCurrent = info.id
-    this.showChatWindow = true
-    this.chatWindowInfo = info
+const chooseChat = info => {
+    preCurrent.value = info.id
+    showChatWindow.value = true
+    chatWindowInfo = info
 }
 
 
@@ -105,5 +105,11 @@ const chooseChat = function (info) {
         }
     }
 
+}
+
+@media screen and(max-width: 984px) {
+    .chatRight {
+        min-width: 465px !important;
+    }
 }
 </style>
