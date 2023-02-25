@@ -3,7 +3,7 @@
         <div class="emoji-content">
             <div class="emoji-wrapper">
                 <ul class="emoji-list">
-                    <li class="emoji-item" v-for="(item, index) in emojiList" :key="index" @click="sendEmoji">
+                    <li class="emoji-item" v-for="(item, index) in emojiList" :key="index" @click="sendEmoji(item)">
                         <img :src="item" alt="emoji">
                     </li>
                 </ul>
@@ -17,7 +17,7 @@
 import emojiList from "@/localData/emoji"
 import { defineEmits } from "vue";
 const emit = defineEmits(['closeEmoji', 'sendEmoji'])
-const sendEmoji = () => emit('sendEmoji')
+const sendEmoji = (item) => emit('sendEmoji', item)
 const closeEmoji = () => emit('closeEmoji')
 </script>
 

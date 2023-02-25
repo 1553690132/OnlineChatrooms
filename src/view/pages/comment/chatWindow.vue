@@ -11,20 +11,20 @@
                 </div>
             </div>
             <div class="other-functions">
-                <LocationFilled />
-                <CameraFilled />
+                <LocationFilled @click="sendLocations" />
+                <CameraFilled @click="sendCamera" />
                 <label for="img">
                     <PictureFilled />
                 </label>
-                <input type="file" id="img" accept="image/*">
+                <input type="file" id="img" accept="image/*" @change="sendPicture">
                 <label for="doc">
                     <UploadFilled />
                 </label>
-                <input type="file" id="doc" accept="application/*,text/*">
+                <input type="file" id="doc" accept="application/*,text/*" @change="sendFile">
             </div>
         </div>
         <div class="bottom-part">
-            <div class="chat-content">
+            <div class="chat-content" ref="chatPart">
                 <div class="chat-wrapper" v-for="item in chatMsg" :key="item.id">
                     <div class="chat-friend" v-if="item.uid !== '1001'">
                         <ChatArea :item="item"></ChatArea>
@@ -41,7 +41,7 @@
                 <div class="emoji-content">
                     <Emoji v-show="showEmojiList" @closeEmoji="chooseEmoji" @sendEmoji="sendEmoji"></Emoji>
                 </div>
-                <input type="text" @keyup.enter="sendMessage" class="input-part">
+                <input type="text" v-model="message" @keyup.enter="sendMessage" class="input-part">
                 <div class="send-btn sendMsg" @click="sendMessage">
                     <img src="@/assets/img/emoji/rocket.png" alt="send-btn">
                 </div>
@@ -53,17 +53,19 @@
 import Personal from '@/components/Personal.vue';
 import ChatArea from '@/components/ChatArea.vue'
 import Emoji from '@/components/Emoji.vue';
-import { defineProps, ref, watch, onMounted, reactive } from 'vue';
+import { defineProps, ref, watch, onMounted, reactive, nextTick } from 'vue';
 import { getChatMsg } from '@/api/getData'
+import { animationScroll } from '@/tools/index'
+import { ElMessage } from 'element-plus';
 const props = defineProps({ chatWindowInfo: Object })
 let showEmojiList = ref(false), chatMsg = reactive([])
 const chooseEmoji = () => showEmojiList.value = !showEmojiList.value
-const sendEmoji = () => showEmojiList.value = !showEmojiList.value
-
+// 切换时更新窗口聊天数据
 const updateMsg = async (info) => {
     let res = await getChatMsg(info)
     chatMsg.length = 0
     chatMsg.push(...res)
+    scrollBottom()
 }
 onMounted(() => {
     updateMsg(props.chatWindowInfo)
@@ -72,7 +74,60 @@ watch(() => props.chatWindowInfo, () => {
     updateMsg(props.chatWindowInfo)
 })
 
+// 获取窗口高度并滑动至最底层
+const chatPart = ref(null) //vue3获取原生dom对象
+const scrollBottom = () => {
+    nextTick(() => {
+        const chatPartDom = chatPart.value
+        animationScroll(chatPartDom, chatPartDom.scrollHeight - chatPartDom.offsetHeight)
+    })
+}
 
+// 发送消息测试
+let message = ref("")
+const sendMessage = () => {
+    if (message) {
+        let newMsg = {
+            headImg: require("@/assets/img/admin.png"),
+            name: 'Admin',
+            time: new Date().toLocaleTimeString(),
+            msg: message,
+            chatType: 0,
+            uid: "1001",
+        }
+        chatMsg.push(newMsg)
+        scrollBottom()
+        message = ""
+    } else ElMessage({ message: '消息不能为空!', type: 'warning' })
+}
+// 发送表情测试
+const sendEmoji = (msg) => {
+    let newMsg = {
+        headImg: require("@/assets/img/admin.png"),
+        name: 'Admin',
+        time: new Date().toLocaleTimeString(),
+        msg,
+        chatType: 1,
+        extend: {
+            imgType: 1
+        },
+        uid: "1001",
+    }
+    chatMsg.push(newMsg)
+    scrollBottom()
+    chooseEmoji()
+}
+
+const sendPicture = () => {
+
+}
+const sendFile = () => {
+
+}
+
+const sendLocations = () => ElMessage({ message: '功能未开发', type: 'error' })
+
+const sendCamera = () => ElMessage({ message: '功能未开发', type: 'error' })
 </script>
 <style lang="less" scoped>
 .chatWindow {
@@ -153,18 +208,17 @@ watch(() => props.chatWindowInfo, () => {
                 .chat-friend {
                     width: 100%;
                     display: flex;
-                    margin-bottom: 20px;
-                    flex-direction: column;
+                    margin-bottom: 25px;
+                    flex-direction: row;
                     justify-content: flex-start;
                     align-items: flex-start;
                 }
 
                 .chat-me {
                     width: 100%;
-                    margin-bottom: 20px;
-                    position: relative;
+                    margin-bottom: 25px;
                     display: flex;
-                    flex-direction: column;
+                    flex-direction: row;
                     justify-content: flex-end;
                     align-items: flex-end;
                 }

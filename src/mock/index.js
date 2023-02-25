@@ -60,7 +60,7 @@ let chatRecords_2 = Mock.mock([
     {
         headImg: require("@/assets/img/head_portrait1.jpg"),
         name: "艾伦·耶格尔",
-        time: "09：14 AM",
+        time: "09：17 AM",
         msg: "追寻自由",
         chatType: 0,
         uid: "1002",
@@ -68,7 +68,7 @@ let chatRecords_2 = Mock.mock([
     {
         headImg: require("@/assets/img/head_portrait1.jpg"),
         name: "艾伦·耶格尔",
-        time: "09：12 AM",
+        time: "09：20 AM",
         msg: require("@/assets/img/emoji/slightly-smiling-face.png"),
         chatType: 1,
         extend: {
@@ -121,6 +121,22 @@ let chatRecords_4 = Mock.mock([
         headImg: require("@/assets/img/head_portrait3.jpg"),
         name: "埃尔文",
         time: "21：13 PM",
+        msg: "在干嘛呢",
+        chatType: 0,
+        uid: "1004",
+    },
+    {
+        headImg: require("@/assets/img/head_portrait3.jpg"),
+        name: "埃尔文",
+        time: "21：14 PM",
+        msg: "在干嘛呢",
+        chatType: 0,
+        uid: "1004",
+    },
+    {
+        headImg: require("@/assets/img/head_portrait3.jpg"),
+        name: "埃尔文",
+        time: "21：15 PM",
         msg: "在干嘛呢",
         chatType: 0,
         uid: "1004",
