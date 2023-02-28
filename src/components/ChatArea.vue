@@ -1,5 +1,5 @@
 <template>
-    <div class="info-time" v-if="item.uid === '1001'">
+    <div class="info-time" v-if="item.uid === '1001'" v-show="showTime">
         <span class="item_time">{{ item.time }}</span>
     </div>
     <div class="item_info" v-else>
@@ -7,10 +7,11 @@
     </div>
 
     <!-- 文字内容 -->
-    <div class="chat-text" v-if="item.chatType == 0">{{ item.msg }}</div>
+    <div class="chat-text" v-if="item.chatType == 0" @dblclick="showTime=!showTime" onselectstart="return false">{{ item.msg }}</div>
     <div class="chat-img" v-if="item.chatType == 1">
         <img :src="item.msg" alt="emoji" v-if="item.extend.imgType == 1">
-        <el-image :src="item.msg" v-else></el-image>
+        <el-image style="max-width: 300px; border-radius: 10px; margin: 0 20px;" :src="item.msg"
+            :preview-src-list="thumbnail" v-else></el-image>
     </div>
     <div class="chat-img" v-if="item.chatType == 2">
         <div class="word-file">
@@ -21,16 +22,18 @@
     <div class="item_info" v-if="item.uid === '1001'">
         <img :src="item.headImg" alt="headimg">
     </div>
-    <div class="info-time" v-else>
+    <div class="info-time" v-else v-show="showTime">
         <span class="item_time">{{ item.time }}</span>
     </div>
 </template>
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
 import FileCard from './FileCard.vue';
 const props = defineProps({
-    item: Object
+    item: Object,
+    thumbnail: Array
 })
+const showTime = ref(false)
 </script>
 <style lang="less" scoped>
 .chat-friend {
@@ -58,7 +61,7 @@ const props = defineProps({
 
     .chat-img {
         img {
-            margin-left: 20px;
+            margin-left: 20px !important;
             width: 100px;
             height: 100px;
         }
@@ -82,7 +85,7 @@ const props = defineProps({
     .item_info {
         display: flex;
         align-self: flex-start;
-        
+
 
         img {
             width: 34px;

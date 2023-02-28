@@ -27,10 +27,10 @@
             <div class="chat-content" ref="chatPart">
                 <div class="chat-wrapper" v-for="item in chatMsg" :key="item.id">
                     <div class="chat-friend" v-if="item.uid !== '1001'">
-                        <ChatArea :item="item"></ChatArea>
+                        <ChatArea :item="item" :thumbnail="thumbnail"></ChatArea>
                     </div>
                     <div class="chat-me" v-else>
-                        <ChatArea :item="item"></ChatArea>
+                        <ChatArea :item="item" :thumbnail="thumbnail"></ChatArea>
                     </div>
                 </div>
             </div>
@@ -53,18 +53,20 @@
 import Personal from '@/components/Personal.vue';
 import ChatArea from '@/components/ChatArea.vue'
 import Emoji from '@/components/Emoji.vue';
-import { defineProps, ref, watch, onMounted, reactive, nextTick } from 'vue';
+import { defineProps, ref, watch, onMounted, reactive, nextTick, defineEmits } from 'vue';
 import { getChatMsg } from '@/api/getData'
 import { animationScroll } from '@/tools/index'
 import { ElMessage } from 'element-plus';
 const props = defineProps({ chatWindowInfo: Object })
-let showEmojiList = ref(false), chatMsg = reactive([])
+const emit = defineEmits(['listSort'])
+let showEmojiList = ref(false), chatMsg = reactive([]), thumbnail = reactive([])
 const chooseEmoji = () => showEmojiList.value = !showEmojiList.value
 // 切换时更新窗口聊天数据
 const updateMsg = async (info) => {
     let res = await getChatMsg(info)
     chatMsg.length = 0
     chatMsg.push(...res)
+    chatMsg.forEach(e => { if (e.chatType === 1 && e.imgType === 2) thumbnail.push(e.msg) })
     scrollBottom()
 }
 onMounted(() => {
@@ -95,10 +97,14 @@ const sendMessage = () => {
             chatType: 0,
             uid: "1001",
         }
-        chatMsg.push(newMsg)
-        scrollBottom()
+        sendMsg(newMsg)
         message = ""
     } else ElMessage({ message: '消息不能为空!', type: 'warning' })
+}
+const sendMsg = (msg) => {
+    chatMsg.push(msg)
+    emit('listSort', props.chatWindowInfo.id)
+    scrollBottom()
 }
 // 发送表情测试
 const sendEmoji = (msg) => {
@@ -114,15 +120,77 @@ const sendEmoji = (msg) => {
         uid: "1001",
     }
     chatMsg.push(newMsg)
+    emit('listSort', props.chatWindowInfo.id)
     scrollBottom()
     chooseEmoji()
 }
-
-const sendPicture = () => {
-
+const sendPicture = (e) => {
+    let newMsg = {
+        headImg: require("@/assets/img/admin.png"),
+        name: 'Admin',
+        time: new Date().toLocaleTimeString(),
+        msg: "",
+        chatType: 1,
+        extend: {
+            imgType: 2
+        },
+        uid: "1001",
+    }
+    let fileName = e.target.files[0]
+    if (!e || !window.FileReader) return // 是否支持file Reader
+    let reader = new FileReader()
+    reader.readAsDataURL(fileName)
+    reader.addEventListener('loadend', function () {
+        newMsg.msg = this.result
+        thumbnail.push(newMsg.msg)
+        sendMsg(newMsg)
+    })
+    e.target.fileName = null
 }
-const sendFile = () => {
-
+const sendFile = (e) => {
+    let newMsg = {
+        headImg: require("@/assets/img/admin.png"),
+        name: 'Admin',
+        time: new Date().toLocaleTimeString(),
+        msg: "",
+        chatType: 2,
+        extend: {
+            fileType: 0
+        },
+        uid: "1001",
+    }
+    let fileName = e.target.files[0]
+    newMsg.msg = fileName
+    if (fileName) {
+        switch (fileName.type) {
+            case "application/msword":
+            case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                newMsg.extend.fileType = 1;
+                break;
+            case "application/vnd.ms-excel":
+            case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+                newMsg.extend.fileType = 2;
+                break;
+            case "application/vnd.ms-powerpoint":
+            case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+                newMsg.extend.fileType = 3;
+                break;
+            case "application/pdf":
+                newMsg.extend.fileType = 4;
+                break;
+            case "application/zip":
+            case "application/x-zip-compressed":
+                newMsg.extend.fileType = 5;
+                break;
+            case "text/plain":
+                newMsg.extend.fileType = 6;
+                break;
+            default:
+                newMsg.extend.fileType = 0;
+        }
+        sendMsg(newMsg)
+        e.target.files = null
+    }
 }
 
 const sendLocations = () => ElMessage({ message: '功能未开发', type: 'error' })

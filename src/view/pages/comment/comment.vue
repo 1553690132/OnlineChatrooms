@@ -16,7 +16,7 @@
         </div>
         <div class="chatRight">
             <div v-if="showChatWindow">
-                <chatWindow :chatWindowInfo="chatWindowInfo"></chatWindow>
+                <chatWindow :chatWindowInfo="chatWindowInfo" @listSort="listSort"></chatWindow>
             </div>
             <div class="showIcon" v-else>
                 <img src="@/assets/img/index.png">
@@ -40,6 +40,18 @@ const chooseChat = info => {
     chatWindowInfo = info
 }
 
+const listSort = id => {
+    if (chatList[0].id !== id) {
+        let nowInfo;
+        for (let i = 0; i < chatList.length; i++) {
+            if (id === chatList[i].id) {
+                nowInfo = chatList[i]
+                chatList.splice(i, 1)
+            }
+        }
+        chatList.unshift(nowInfo)
+    }
+}
 
 
 </script>
