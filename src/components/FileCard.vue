@@ -9,18 +9,18 @@
         <img src="@/assets/img/fileImg/txt.png" alt="txt" v-else />
 
         <div class="word">
-            <span class="">{{ file.name }}</span>
-            <span class="">{{ size }}</span>
+            <span>{{ file.name }}</span>
+            <span>{{ size }}</span>
         </div>
     </div>
 </template>
 <script setup>
-import { file } from '@babel/types';
-import { defineProps, computed } from 'vue';
+import { defineProps, computed, onMounted } from 'vue';
 const props = defineProps({
     fileType: Number,
     file: File
 })
+onMounted(() => console.log(props.file))
 const size = computed({
     get() {
         if (props.file.size >= 1024) {

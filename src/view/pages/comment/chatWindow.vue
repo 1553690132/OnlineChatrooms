@@ -48,18 +48,21 @@
             </div>
         </div>
     </div>
+    <CameraTake v-show="cameraShow" @showCamera="showCamera"></CameraTake>
 </template>
 <script setup>
 import Personal from '@/components/Personal.vue';
 import ChatArea from '@/components/ChatArea.vue'
+import CameraTake from '@/components/CameraTake.vue'
 import Emoji from '@/components/Emoji.vue';
 import { defineProps, ref, watch, onMounted, reactive, nextTick, defineEmits } from 'vue';
 import { getChatMsg } from '@/api/getData'
 import { animationScroll } from '@/tools/index'
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 const props = defineProps({ chatWindowInfo: Object })
 const emit = defineEmits(['listSort'])
 let showEmojiList = ref(false), chatMsg = reactive([]), thumbnail = reactive([])
+let cameraShow = ref(false)
 const chooseEmoji = () => showEmojiList.value = !showEmojiList.value
 // 切换时更新窗口聊天数据
 const updateMsg = async (info) => {
@@ -195,7 +198,29 @@ const sendFile = (e) => {
 
 const sendLocations = () => ElMessage({ message: '功能未开发', type: 'error' })
 
-const sendCamera = () => ElMessage({ message: '功能未开发', type: 'error' })
+const showCamera = () => cameraShow.value = !cameraShow.value
+
+const sendCamera = () => {
+    ElMessageBox.confirm(
+        '我们需要获取您的摄像头权限，是否继续？',
+        '摄像',
+        {
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
+            type: 'warning',
+        }
+    )
+        .then(() => {
+            showCamera()
+        })
+        .catch(() => {
+            ElMessage({
+                type: 'info',
+                message: 'Delete canceled',
+            })
+        })
+}
+
 </script>
 <style lang="less" scoped>
 .chatWindow {

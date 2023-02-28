@@ -67,3 +67,47 @@ export function fileTypes() {
         'aplication/zip': 'zpi',
     }
 }
+
+// 拍照权限获取
+export function turnOnCamera(element) {
+    // 摄像头信息
+    let constraints = {
+        video: {
+            height: element.offsetHeight,
+            width: element.offsetWidth
+        }
+    }
+    // 请求用户摄像头权限，允许时将摄像头图像转移至element上显示
+    navigator.mediaDevices.getUserMedia(constraints).then(res => {
+        element.srcObject = res
+        element.play()
+    }).catch((err) => console.log(err))
+}
+
+// 拍照图片绘制
+export function shutter(canvas, video) {
+    let width = +video.offsetWidth, height = +video.offsetHeight
+    canvas.width = width
+    canvas.height = height
+    changePhotoPart(true, canvas, video)
+    canvas.getContext("2d").drawImage(video, 0, 0, width, height)
+}
+
+// 拍照获取图片后下载并完成发送
+export function download(canvas) {
+    const ele = document.createElement('a')
+    ele.href = canvas.toDataURL("image/png")
+    ele.download = new Date().getTime() + ".png"
+    ele.click()
+}
+
+// 摄像头区域和canvas显示转换
+export function changePhotoPart(flag, canvas, video) {
+    if (flag) {
+        video.style.display = 'none'
+        canvas.style.display = 'block'
+    } else {
+        video.style.display = 'block'
+        canvas.style.display = 'none'
+    }
+}
