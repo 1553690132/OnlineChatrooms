@@ -7,7 +7,8 @@
     </div>
 
     <!-- 文字内容 -->
-    <div class="chat-text" v-if="item.chatType == 0" @dblclick="showTime=!showTime" onselectstart="return false">{{ item.msg }}</div>
+    <div class="chat-text" v-if="item.chatType == 0" @dblclick="showTime = !showTime" onselectstart="return false">{{ item.msg
+    }}</div>
     <div class="chat-img" v-if="item.chatType == 1">
         <img :src="item.msg" alt="emoji" v-if="item.extend.imgType == 1">
         <el-image style="max-width: 300px; border-radius: 10px; margin: 0 20px;" :src="item.msg"
@@ -17,6 +18,9 @@
         <div class="word-file">
             <FileCard :fileType="item.extend.fileType" :file="item.msg"></FileCard>
         </div>
+    </div>
+    <div class="chat-img" v-if="item.chatType == 3">
+        <LocationCard></LocationCard>
     </div>
 
     <div class="item_info" v-if="item.uid === '1001'">
@@ -29,6 +33,7 @@
 <script setup>
 import { defineProps, ref } from 'vue';
 import FileCard from './FileCard.vue';
+import LocationCard from './LocationCard.vue';
 const props = defineProps({
     item: Object,
     thumbnail: Array

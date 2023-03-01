@@ -111,3 +111,48 @@ export function changePhotoPart(flag, canvas, video) {
         canvas.style.display = 'none'
     }
 }
+
+// 绘制百度地图
+export function drawMap(name, longitude, latitude) {
+    let map = new BMapGL.Map(name);
+    map.enableScrollWheelZoom(true);
+    map.centerAndZoom(new BMapGL.Point(longitude, latitude), 11);
+    let scaleCtrl = new BMapGL.ScaleControl();  // 添加比例尺控件
+    map.addControl(scaleCtrl);
+    let zoomCtrl = new BMapGL.ZoomControl();  // 添加缩放控件
+    map.addControl(zoomCtrl);
+    let locationCtrl = new BMapGL.LocationControl()
+    map.addControl(locationCtrl)
+    getCity()
+}
+
+// 获取城市
+export function getCity() {
+    function myFun(result) {
+        let cityName = result.name
+        console.log(cityName);
+    }
+
+    let myCity = new BMapGL.LocalCity()
+    myCity.get(myFun)
+}
+
+// 获取地址
+export function getLocation(name) {
+    function showLocation(position) {
+        let latitude = position.coords.latitude
+        let longitude = position.coords.longitude
+        sessionStorage.setItem('latitude', latitude)
+        sessionStorage.setItem('longitude', longitude)
+        drawMap(name, longitude, latitude)
+    }
+    function checkError() {
+        alert("timeout!")
+    }
+    if (navigator.geolocation) {
+        // 监测浏览器是否支持地理定位API
+        navigator.geolocation.getCurrentPosition(showLocation, checkError)
+    } else {
+        alert('不支持地理定位！')
+    }
+}

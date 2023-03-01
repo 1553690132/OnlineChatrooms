@@ -11,7 +11,7 @@
                 </div>
             </div>
             <div class="other-functions">
-                <LocationFilled @click="sendLocations" />
+                <LocationFilled @click="showLocation" />
                 <CameraFilled @click="sendCamera" />
                 <label for="img">
                     <PictureFilled />
@@ -49,11 +49,13 @@
         </div>
     </div>
     <CameraTake v-show="cameraShow" @showCamera="showCamera"></CameraTake>
-</template>
+    <Location v-show="locationShow" @showLocation="showLocation" @sendLocation="sendLocation"></Location>
+</template> 
 <script setup>
 import Personal from '@/components/Personal.vue';
 import ChatArea from '@/components/ChatArea.vue'
 import CameraTake from '@/components/CameraTake.vue'
+import Location from '@/components/Location.vue';
 import Emoji from '@/components/Emoji.vue';
 import { defineProps, ref, watch, onMounted, reactive, nextTick, defineEmits } from 'vue';
 import { getChatMsg } from '@/api/getData'
@@ -62,7 +64,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 const props = defineProps({ chatWindowInfo: Object })
 const emit = defineEmits(['listSort'])
 let showEmojiList = ref(false), chatMsg = reactive([]), thumbnail = reactive([])
-let cameraShow = ref(false)
+let cameraShow = ref(false), locationShow = ref(false)
 const chooseEmoji = () => showEmojiList.value = !showEmojiList.value
 // 切换时更新窗口聊天数据
 const updateMsg = async (info) => {
@@ -196,8 +198,6 @@ const sendFile = (e) => {
     }
 }
 
-const sendLocations = () => ElMessage({ message: '功能未开发', type: 'error' })
-
 const showCamera = () => cameraShow.value = !cameraShow.value
 
 const sendCamera = () => {
@@ -219,6 +219,23 @@ const sendCamera = () => {
                 message: 'Delete canceled',
             })
         })
+}
+
+const showLocation = () => locationShow.value = !locationShow.value
+const sendLocation = () => {
+    let newMsg = {
+        headImg: require("@/assets/img/admin.png"),
+        name: 'Admin',
+        time: new Date().toLocaleTimeString(),
+        msg: "",
+        chatType: 3,
+        uid: "1001",
+    }
+    let address = sessionStorage.getItem('address')
+    if (address) {
+        newMsg.msg = address
+        sendMsg(newMsg)
+    }
 }
 
 </script>
