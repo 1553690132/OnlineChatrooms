@@ -3,34 +3,20 @@
         <div class="map-wrapper">
             <div id="allmap"></div>
             <el-button :icon="Close" circle class="closeBtn" @click="emit('showLocation')" />
-            <el-button :icon="Check" type="success" circle class="sendBtn" @click="sendLocation"></el-button>
+            <el-button :icon="Check" type="success" circle class="sendBtn" @click="emit('sendLocation')"></el-button>
         </div>
     </div>
 </template>
 <script setup>
-import { getLocation } from '@/tools';
-import { onMounted, defineEmits, ref } from 'vue';
-import { ElButton, ElMessage } from 'element-plus';
+import { getLocations } from '@/tools';
+import { onMounted, defineEmits} from 'vue';
+import { ElButton } from 'element-plus';
 import { Check, Close } from '@element-plus/icons-vue';
-import axios from 'axios';
 const emit = defineEmits(['showLocation', 'sendLocation'])
 onMounted(() => {
-    getLocation("allmap")
+    getLocations("allmap")
 })
-const sendLocation = () => {
-    axios.get(`/api/reverse_geocoding/v3/?output=json&coordtype=wgs84ll&ak=OiL9s730uNG9SPmKLqQn9ISM6xPf1EGI&`, {
-        params: {
-            location: `${sessionStorage.getItem('latitude')},${sessionStorage.getItem('longitude')}`
-        }
-    }).then(res => {
-        ElMessage({ message: '地址发送成功!', type: 'success' })
-        sessionStorage.setItem('address', res.data.result.formatted_address)
-        emit('sendLocation')
-    }).catch(err => {
-        ElMessage({ message: '地址无法获取! 请联系相关人员！', type: 'error' })
-    })
-    emit('showLocation')
-}
+
 </script>
 <style lang="less" scoped>
 .map {

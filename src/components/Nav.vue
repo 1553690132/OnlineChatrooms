@@ -15,7 +15,7 @@
             </ul>
         </div>
         <div class="user-part">
-            <Personal :imgUrl="imgUrl" />
+            <Personal :imgUrl="imgUrl" :online="userStore.online" />
         </div>
     </div>
 </template>
@@ -24,16 +24,11 @@
 import { ref } from 'vue'
 import Personal from './Personal.vue'
 import routerSvg from '../localData/routerSvg'
-import { useRouter } from 'vue-router';
-import { ElMessage } from 'element-plus';
+import { userInfoStore } from '@/store/userStore'
+const userStore = new userInfoStore()
 const current = ref(0)
 const imgUrl = ref('https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png')
-const router = useRouter()
 const changeMenu = function (index) {
-    if (index !== 0) {
-        ElMessage('开发中，敬请期待！')
-        router.push('/')
-    }
     current.value = index;
 }
 

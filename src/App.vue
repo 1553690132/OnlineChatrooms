@@ -1,11 +1,10 @@
 <template>
   <div id="app">
-    <home></home>
+    <router-view></router-view>
   </div>
 </template>
 
 <script setup>
-import home from './view/home.vue';
 </script>
 
 <style lang="less">

@@ -1,23 +1,22 @@
 <template>
-    <div class="friendCard" :class="{ activeCard: chatFriendInfo.id == preCurrent }">
+    <div class="friendCard" :class="{ activeCard: props.chatFriendInfo._id == windowStore.preCurrent }">
         <div class="info">
-            <Personal :imgUrl="chatFriendInfo.headImg"></Personal>
+            <Personal :imgUrl="props.chatFriendInfo.headImg" :online="props.chatFriendInfo.online"></Personal>
             <div class="info-msg">
-                <div class="name">{{ chatFriendInfo.name }}</div>
-                <div class="detail">{{ chatFriendInfo.detail }}</div>
+                <div class="name">{{ props.chatFriendInfo.nickname }}</div>
+                <div class="detail">{{ props.chatFriendInfo.detail }}</div>
             </div>
         </div>
     </div>
 </template>
 <script setup>
 import { defineProps } from 'vue';
+import {chatWindowStore } from '@/store/chatWindowStore'
 import Personal from '@/components/Personal.vue'
+const windowStore = chatWindowStore()
 const props = defineProps({
     chatFriendInfo: Object,
-    preCurrent: String
 })
-
-
 </script>
 <style lang="less" scoped>
 @normal-color: #1d90f5;

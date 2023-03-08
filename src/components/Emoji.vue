@@ -17,7 +17,9 @@
 import emojiList from "@/localData/emoji"
 import { defineEmits } from "vue";
 const emit = defineEmits(['closeEmoji', 'sendEmoji'])
-const sendEmoji = (item) => emit('sendEmoji', item)
+const sendEmoji = (item) => {
+    emit('sendEmoji', item)
+}
 const closeEmoji = () => emit('closeEmoji')
 </script>
 

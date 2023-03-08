@@ -1,18 +1,19 @@
 <template>
-    <div class="info-time" v-if="item.uid === '1001'" v-show="showTime">
+    <div class="info-time" v-if="item.username === userStore.username" v-show="showTime">
         <span class="item_time">{{ item.time }}</span>
     </div>
     <div class="item_info" v-else>
-        <img :src="item.headImg" alt="headimg">
+        <img :src="windowStore.chatWindowInfo.headImg" alt="headimg">
     </div>
 
     <!-- 文字内容 -->
-    <div class="chat-text" v-if="item.chatType == 0" @dblclick="showTime = !showTime" onselectstart="return false">{{ item.msg
+    <div class="chat-text" v-if="item.chatType == 0" @dblclick="showTime = !showTime" onselectstart="return false">{{
+        item.msg
     }}</div>
     <div class="chat-img" v-if="item.chatType == 1">
         <img :src="item.msg" alt="emoji" v-if="item.extend.imgType == 1">
-        <el-image style="max-width: 300px; border-radius: 10px; margin: 0 20px;" :src="item.msg"
-            :preview-src-list="thumbnail" v-else></el-image>
+        <el-image style="max-width: 300px; border-radius: 10px; margin: 0 20px;" :src="srcs"
+            :preview-src-list="[srcs]" v-else></el-image>
     </div>
     <div class="chat-img" v-if="item.chatType == 2">
         <div class="word-file">
@@ -20,23 +21,29 @@
         </div>
     </div>
     <div class="chat-img" v-if="item.chatType == 3">
-        <LocationCard></LocationCard>
+        <LocationCard :location="item.msg"></LocationCard>
     </div>
 
-    <div class="item_info" v-if="item.uid === '1001'">
-        <img :src="item.headImg" alt="headimg">
+    <div class="item_info" v-if="item.username === userStore.username">
+        <img :src="userStore.userImg" alt="headimg">
     </div>
     <div class="info-time" v-else v-show="showTime">
         <span class="item_time">{{ item.time }}</span>
     </div>
 </template>
 <script setup>
-import { defineProps, ref } from 'vue';
+import { defineProps, ref, computed } from 'vue';
+import { userInfoStore } from '@/store/userStore'
+import { chatWindowStore } from '@/store/chatWindowStore';
 import FileCard from './FileCard.vue';
 import LocationCard from './LocationCard.vue';
+const userStore = userInfoStore()
+const windowStore = chatWindowStore()
 const props = defineProps({
     item: Object,
-    thumbnail: Array
+})
+const srcs = computed(() => {
+    return props.item.extend.imgType === 2 ? Object.keys(props.item.msg)[0].replaceAll(' ', '+') : ""
 })
 const showTime = ref(false)
 </script>

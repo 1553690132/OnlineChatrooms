@@ -3,11 +3,12 @@
         <div class="top-part">
             <div class="infos">
                 <div class="head-sculpture">
-                    <Personal :imgUrl="chatWindowInfo.headImg"></Personal>
+                    <Personal :imgUrl="windowStore.chatWindowInfo.headImg" :online="windowStore.chatWindowInfo.online">
+                    </Personal>
                 </div>
                 <div class="info-detail">
-                    <div class="info-name">{{ chatWindowInfo.name }}</div>
-                    <div class="info-sculpture">{{ chatWindowInfo.detail }}</div>
+                    <div class="info-name">{{ windowStore.chatWindowInfo.nickname }}</div>
+                    <div class="info-sculpture">{{ windowStore.chatWindowInfo.detail }}</div>
                 </div>
             </div>
             <div class="other-functions">
@@ -23,14 +24,14 @@
                 <input type="file" id="doc" accept="application/*,text/*" @change="sendFile">
             </div>
         </div>
-        <div class="bottom-part">
+        <div class="bottom-part" v-loading="loading.isLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
             <div class="chat-content" ref="chatPart">
                 <div class="chat-wrapper" v-for="item in chatMsg" :key="item.id">
-                    <div class="chat-friend" v-if="item.uid !== '1001'">
-                        <ChatArea :item="item" :thumbnail="thumbnail"></ChatArea>
+                    <div class="chat-friend" v-if="item.username !== userStore.username">
+                        <ChatArea :item="item"></ChatArea>
                     </div>
                     <div class="chat-me" v-else>
-                        <ChatArea :item="item" :thumbnail="thumbnail"></ChatArea>
+                        <ChatArea :item="item"></ChatArea>
                     </div>
                 </div>
             </div>
@@ -48,8 +49,8 @@
             </div>
         </div>
     </div>
-    <CameraTake v-show="cameraShow" @showCamera="showCamera"></CameraTake>
-    <Location v-show="locationShow" @showLocation="showLocation" @sendLocation="sendLocation"></Location>
+    <CameraTake v-if="cameraShow" @showCamera="showCamera"></CameraTake>
+    <Location v-if="locationShow" @showLocation="showLocation" @sendLocation="sendLocation"></Location>
 </template> 
 <script setup>
 import Personal from '@/components/Personal.vue';
@@ -57,28 +58,54 @@ import ChatArea from '@/components/ChatArea.vue'
 import CameraTake from '@/components/CameraTake.vue'
 import Location from '@/components/Location.vue';
 import Emoji from '@/components/Emoji.vue';
-import { defineProps, ref, watch, onMounted, reactive, nextTick, defineEmits } from 'vue';
-import { getChatMsg } from '@/api/getData'
+import { ref, watch, onMounted, reactive, nextTick } from 'vue';
 import { animationScroll } from '@/tools/index'
 import { ElMessage, ElMessageBox } from 'element-plus';
-const props = defineProps({ chatWindowInfo: Object })
-const emit = defineEmits(['listSort'])
-let showEmojiList = ref(false), chatMsg = reactive([]), thumbnail = reactive([])
+import { chatWindowStore } from '@/store/chatWindowStore';
+import { userInfoStore } from '@/store/userStore';
+import { loadingStore } from '@/store/lodingStore';
+import qs from 'qs';
+import $axios from '@/api';
+import socket from '@/tools/socket';
+import axios from 'axios';
+const windowStore = chatWindowStore()
+const userStore = userInfoStore()
+const loading = loadingStore()
+let showEmojiList = ref(false), chatMsg = reactive([])
 let cameraShow = ref(false), locationShow = ref(false)
 const chooseEmoji = () => showEmojiList.value = !showEmojiList.value
+
 // 切换时更新窗口聊天数据
 const updateMsg = async (info) => {
-    let res = await getChatMsg(info)
+    loading.showLoading
+    let { data: res } = await $axios.get('chat/gain', { params: { sid: userStore._id, rid: info._id } })
+    loading.hideLoading
+    if (res.status !== 200) return ElMessage({ type: 'error', message: res.message })
     chatMsg.length = 0
-    chatMsg.push(...res)
+    if (!res.message.sendMsg) {
+        chatMsg.push(...res.message.recMsg.chats)
+    } else if (!res.message.recMsg) {
+        chatMsg.push(...res.message.sendMsg.chats)
+    } else {
+        chatMsg.push(...res.message.sendMsg.chats, ...res.message.recMsg.chats)
+    }
+    chatMsg.sort((a, b) => {
+        return a.time - b.time
+    })
     chatMsg.forEach(e => { if (e.chatType === 1 && e.imgType === 2) thumbnail.push(e.msg) })
     scrollBottom()
 }
+
 onMounted(() => {
-    updateMsg(props.chatWindowInfo)
+    updateMsg(windowStore.chatWindowInfo)
+    socket.on('upMsg', (data) => {
+        chatMsg.push(data.msg)
+        scrollBottom()
+    })
 })
-watch(() => props.chatWindowInfo, () => {
-    updateMsg(props.chatWindowInfo)
+
+watch(() => windowStore.chatWindowInfo, () => {
+    updateMsg(windowStore.chatWindowInfo)
 })
 
 // 获取窗口高度并滑动至最底层
@@ -90,56 +117,87 @@ const scrollBottom = () => {
     })
 }
 
-// 发送消息测试
+
 let message = ref("")
+// 发送消息
 const sendMessage = () => {
-    if (message) {
+    if (message.value) {
         let newMsg = {
-            headImg: require("@/assets/img/admin.png"),
-            name: 'Admin',
-            time: new Date().toLocaleTimeString(),
+            username: userStore.username,
+            time: new Date().getTime(),
             msg: message,
             chatType: 0,
-            uid: "1001",
         }
-        sendMsg(newMsg)
-        message = ""
+        sendMsg(newMsg, 'text')
+        message.value = ""
     } else ElMessage({ message: '消息不能为空!', type: 'warning' })
 }
-const sendMsg = (msg) => {
-    chatMsg.push(msg)
-    emit('listSort', props.chatWindowInfo.id)
+
+const sendMsg = async (msgs, type = '') => {
+    let chats = msgs;
+    // 纯文本处理响应式
+    if (type === 'text') {
+        chats = JSON.stringify({ ...msgs, msg: msgs.msg.value })
+    } else if (type === 'image') {
+        chats = JSON.stringify({ ...msgs, msg: qs.parse(msgs.msg) })
+    } else if (type === 'file') {
+        const formData = new FormData()
+        formData.append("sid", userStore._id)
+        formData.append("rid", windowStore.chatWindowInfo._id)
+        formData.append("file", msgs.msg)
+        formData.append("others", JSON.stringify({ ...msgs, msg: '' }))
+        const { data: res } = await axios.post('chat/file', formData, {
+            'Content-type': 'multipart/form-data'
+        })
+        if (res.status !== 200) return ElMessage({ type: 'error', message: res.message })
+        updateMsg(windowStore.chatWindowInfo)
+        userStore.listSort(windowStore.chatWindowInfo._id)
+        scrollBottom()
+        return;
+    } else {
+        console.log(msgs);
+        chats = JSON.stringify({ ...msgs })
+    }
+
+    socket.emit('privateChat', {
+        sid: userStore._id,
+        rid: windowStore.chatWindowInfo._id,
+        msg: chats,
+    })
+    const { data: res } = await $axios.post('chat/send', { sid: userStore._id, rid: windowStore.chatWindowInfo._id, chats })
+    if (res.status !== 200) return ElMessage({ type: 'error', message: res.message })
+    // 发送后重新获取
+    updateMsg(windowStore.chatWindowInfo)
+    userStore.listSort(windowStore.chatWindowInfo._id)
     scrollBottom()
 }
-// 发送表情测试
+
+// 发送表情
 const sendEmoji = (msg) => {
     let newMsg = {
-        headImg: require("@/assets/img/admin.png"),
-        name: 'Admin',
-        time: new Date().toLocaleTimeString(),
+        username: userStore.username,
+        time: new Date().getTime(),
         msg,
         chatType: 1,
         extend: {
             imgType: 1
-        },
-        uid: "1001",
+        }
     }
-    chatMsg.push(newMsg)
-    emit('listSort', props.chatWindowInfo.id)
+    sendMsg(newMsg)
+    userStore.listSort(windowStore.chatWindowInfo._id)
     scrollBottom()
     chooseEmoji()
 }
+
 const sendPicture = (e) => {
     let newMsg = {
-        headImg: require("@/assets/img/admin.png"),
-        name: 'Admin',
-        time: new Date().toLocaleTimeString(),
+        username: userStore.username,
+        time: new Date().getTime(),
         msg: "",
         chatType: 1,
         extend: {
             imgType: 2
-        },
-        uid: "1001",
+        }
     }
     let fileName = e.target.files[0]
     if (!e || !window.FileReader) return // 是否支持file Reader
@@ -147,22 +205,20 @@ const sendPicture = (e) => {
     reader.readAsDataURL(fileName)
     reader.addEventListener('loadend', function () {
         newMsg.msg = this.result
-        thumbnail.push(newMsg.msg)
-        sendMsg(newMsg)
+        sendMsg(newMsg, 'image')
     })
     e.target.fileName = null
 }
+
 const sendFile = (e) => {
     let newMsg = {
-        headImg: require("@/assets/img/admin.png"),
-        name: 'Admin',
-        time: new Date().toLocaleTimeString(),
+        username: userStore.username,
+        time: new Date().getTime(),
         msg: "",
         chatType: 2,
         extend: {
             fileType: 0
         },
-        uid: "1001",
     }
     let fileName = e.target.files[0]
     newMsg.msg = fileName
@@ -193,7 +249,7 @@ const sendFile = (e) => {
             default:
                 newMsg.extend.fileType = 0;
         }
-        sendMsg(newMsg)
+        sendMsg(newMsg, 'file')
         e.target.files = null
     }
 }
@@ -224,18 +280,17 @@ const sendCamera = () => {
 const showLocation = () => locationShow.value = !locationShow.value
 const sendLocation = () => {
     let newMsg = {
-        headImg: require("@/assets/img/admin.png"),
-        name: 'Admin',
-        time: new Date().toLocaleTimeString(),
+        username: userStore.username,
+        time: new Date().getTime(),
         msg: "",
         chatType: 3,
-        uid: "1001",
     }
     let address = sessionStorage.getItem('address')
     if (address) {
         newMsg.msg = address
         sendMsg(newMsg)
     }
+    showLocation()
 }
 
 </script>

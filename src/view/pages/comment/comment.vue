@@ -7,16 +7,16 @@
             <div class="chatting">
                 <span class="chat-title">聊天列表</span>
                 <div class="chat-list">
-                    <div class="friend-list" v-for="chatFriendInfo in chatList" :key="chatFriendInfo.id"
-                        @click="chooseChat(chatFriendInfo)">
-                        <FriendCard :chatFriendInfo="chatFriendInfo" :preCurrent="preCurrent"></FriendCard>
+                    <div class="friend-list" v-for="chatFriendInfo in userStore.friendList" :key="chatFriendInfo._id"
+                        @click="windowStore.chooseChat(chatFriendInfo)">
+                        <FriendCard :chatFriendInfo="chatFriendInfo"></FriendCard>
                     </div>
                 </div>
             </div>
         </div>
         <div class="chatRight">
-            <div v-if="showChatWindow">
-                <chatWindow :chatWindowInfo="chatWindowInfo" @listSort="listSort"></chatWindow>
+            <div v-if="windowStore.showChatWindow">
+                <chatWindow></chatWindow>
             </div>
             <div class="showIcon" v-else>
                 <img src="@/assets/img/index.png">
@@ -26,32 +26,41 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import FriendCard from '@/components/FriendCard.vue'
 import chatWindow from './chatWindow.vue'
-import chatFriendList from '@/hooks/chatFriendList'
-let chatList = chatFriendList()
-let preCurrent = ref('')
-let showChatWindow = ref(false)
-let chatWindowInfo = reactive({})
-const chooseChat = info => {
-    preCurrent.value = info.id
-    showChatWindow.value = true
-    chatWindowInfo = info
+import { userInfoStore } from '@/store/userStore';
+import { chatWindowStore } from '@/store/chatWindowStore';
+import socket from '@/tools/socket';
+const userStore = userInfoStore()
+const windowStore = chatWindowStore()
+const sendBreakage = async () => {
+    const blob = new Blob([JSON.stringify({ username: userStore.username })], {
+        type: 'application/x-www-form-urlencoded; charset=UTF-8'
+    })
+    navigator.sendBeacon('http://localhost:3007/api/breakage', blob)
 }
+const timer = setInterval(() => {
+    userStore.getUserInfo()
+}, 5000)
 
-const listSort = id => {
-    if (chatList[0].id !== id) {
-        let nowInfo;
-        for (let i = 0; i < chatList.length; i++) {
-            if (id === chatList[i].id) {
-                nowInfo = chatList[i]
-                chatList.splice(i, 1)
-            }
-        }
-        chatList.unshift(nowInfo)
-    }
-}
+// 异步绑定uid值作为后端判断依据
+onMounted(() => {
+    userStore.getUserInfo()
+    socket.on('connect', async () => {
+        userStore.getUserInfo()
+        const _id = await userStore.getUserInfo()
+        socket.emit('logins', _id)
+    })
+    timer
+    window.addEventListener('unload', sendBreakage)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('unload', sendBreakage)
+    clearInterval(timer)
+})
+
 
 
 </script>

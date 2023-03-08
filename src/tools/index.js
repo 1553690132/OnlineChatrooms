@@ -123,22 +123,28 @@ export function drawMap(name, longitude, latitude) {
     map.addControl(zoomCtrl);
     let locationCtrl = new BMapGL.LocationControl()
     map.addControl(locationCtrl)
+    getLoc(longitude, latitude)
+    map.addEventListener('click', function (e) {
+        const lng = e.latlng.lng.toFixed(4), lat = e.latlng.lat.toFixed(4)
+        makeMarker(map, lng, lat)
+        getLoc(lng, lat)
+    })
     getCity()
+
 }
 
 // 获取城市
 export function getCity() {
     function myFun(result) {
         let cityName = result.name
-        console.log(cityName);
-    }
 
+    }
     let myCity = new BMapGL.LocalCity()
     myCity.get(myFun)
 }
 
 // 获取地址
-export function getLocation(name) {
+export function getLocations(name) {
     function showLocation(position) {
         let latitude = position.coords.latitude
         let longitude = position.coords.longitude
@@ -147,7 +153,7 @@ export function getLocation(name) {
         drawMap(name, longitude, latitude)
     }
     function checkError() {
-        alert("timeout!")
+        console.error('time out')
     }
     if (navigator.geolocation) {
         // 监测浏览器是否支持地理定位API
@@ -156,3 +162,30 @@ export function getLocation(name) {
         alert('不支持地理定位！')
     }
 }
+
+// 绘制标注点
+function makeMarker(map, longitude, latitude) {
+    const point = new BMapGL.Point(longitude, latitude)
+    const marker = new BMapGL.Marker(point)
+    map.addOverlay(marker)
+}
+
+// 获取确切地点
+function getLoc(longitude, latitude) {
+    let myGeo = new BMapGL.Geocoder()
+    myGeo.getLocation(new BMapGL.Point(longitude, latitude), res => {
+        if (res) {
+            sessionStorage.setItem('address', res.address + res.business)
+        }
+    })
+}
+
+// 消息时间计算
+/**
+ * 若两次消息时间间隔大于3min则显示时间
+ */
+// function cacTime(chatMsg) {
+//     let isTimeShow = false
+//     if(chatMsg.length === 1 || (chatMsg[chatMsg.length - 1]))
+//     return isTimeShow
+// }

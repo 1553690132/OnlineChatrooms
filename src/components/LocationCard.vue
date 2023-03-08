@@ -3,15 +3,15 @@
         <div class="location-card-wrapper">
             <div class="location-pic"><img src="@/assets/img/location.png" alt="address"></div>
             <div class="location-title">
-                {{ locName }}
+                {{ location }}
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-const locName = ref(sessionStorage.getItem('address'))
+import { defineProps } from 'vue';
+const props = defineProps({ location: String })
 </script>
 
 <style lang="less" scoped>
