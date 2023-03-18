@@ -7,7 +7,9 @@ export const userInfoStore = defineStore('userInfoStore', {
         return {
             _id: '',
             username: '',
+            nickname: '',
             userImg: '',
+            detail: '',
             friendList: [],
             online: false
         }
@@ -19,7 +21,9 @@ export const userInfoStore = defineStore('userInfoStore', {
                 if (res.status !== 200) return ElMessage({ type: 'error', message: '获取失败!' })
                 this._id = res.data.user._id
                 this.username = res.data.user.username
+                this.nickname = res.data.user.nickname
                 this.userImg = res.data.user.headImg
+                this.detail = res.data.user.detail
                 this.friendList = []
                 this.friendList.push(...res.data.friendList)
                 this.friendList.sort((a, b) => {

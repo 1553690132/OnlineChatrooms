@@ -201,10 +201,12 @@ const sendPicture = (e) => {
     }
     let fileName = e.target.files[0]
     if (!e || !window.FileReader) return // 是否支持file Reader
+    console.log(fileName);
     let reader = new FileReader()
     reader.readAsDataURL(fileName)
     reader.addEventListener('loadend', function () {
         newMsg.msg = this.result
+        console.log(newMsg);
         sendMsg(newMsg, 'image')
     })
     e.target.fileName = null

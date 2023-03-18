@@ -179,13 +179,3 @@ function getLoc(longitude, latitude) {
         }
     })
 }
-
-// 消息时间计算
-/**
- * 若两次消息时间间隔大于3min则显示时间
- */
-// function cacTime(chatMsg) {
-//     let isTimeShow = false
-//     if(chatMsg.length === 1 || (chatMsg[chatMsg.length - 1]))
-//     return isTimeShow
-// }

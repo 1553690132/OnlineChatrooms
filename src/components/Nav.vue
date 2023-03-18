@@ -15,9 +15,10 @@
             </ul>
         </div>
         <div class="user-part">
-            <Personal :imgUrl="imgUrl" :online="userStore.online" />
+            <Personal :imgUrl="userStore.userImg" :online="userStore.online" @click="showPersonalConfig" />
         </div>
     </div>
+    <Information v-if="configShow" @showPersonalConfig="showPersonalConfig"></Information>
 </template>
   
 <script setup>
@@ -25,13 +26,14 @@ import { ref } from 'vue'
 import Personal from './Personal.vue'
 import routerSvg from '../localData/routerSvg'
 import { userInfoStore } from '@/store/userStore'
+import Information from './Information.vue';
 const userStore = new userInfoStore()
 const current = ref(0)
-const imgUrl = ref('https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png')
+let configShow = ref(false)
 const changeMenu = function (index) {
     current.value = index;
 }
-
+const showPersonalConfig = () => configShow.value = !configShow.value
 
 </script>
   
