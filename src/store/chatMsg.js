@@ -5,12 +5,12 @@ import $axios from "@/api"
 export const chatPrivateMsgStore = defineStore('chatPrivateMsgStore', {
     state: () => {
         return {
-            chatMsg: []
+            chatMsg: [],
+            headImg: ''
         }
     },
     actions: {
         async updateMsg(info) {
-            console.log(123);
             const userStore = userInfoStore()
             let { data: res } = await $axios.get('chat/gain', { params: { sid: userStore._id, rid: info._id } })
             if (res.status !== 200) return ElMessage({ type: 'error', message: res.message })
@@ -26,6 +26,5 @@ export const chatPrivateMsgStore = defineStore('chatPrivateMsgStore', {
             })
             this.chatMsg.forEach(e => { if (e.chatType === 1 && e.imgType === 2) thumbnail.push(e.msg) })
         },
-
     }
 })

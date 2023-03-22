@@ -16,7 +16,7 @@
 </template>
 <script setup>
 import { ref } from 'vue'
-import LoginInfo from '@/components/LoginInfo.vue';
+import LoginInfo from '@/components/login/LoginInfo.vue';
 let loginOrRegister = ref(true)
 const changePart = () => {
     loginOrRegister.value = !loginOrRegister.value

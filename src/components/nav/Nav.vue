@@ -2,8 +2,8 @@
     <div class="nav">
         <div class="nav-menu">
             <ul class="menu-list">
-                <li v-for="(item, index) in routerSvg" :class="{ activeNav: index == current }" :key="index"
-                    @click="changeMenu(index)" :data="current">
+                <li v-for="(item, index) in routerSvg" :class="{ activeNav: index == navStore.current }" :key="index"
+                    @click="navStore.changeMenu(index)" :data="navStore.current">
                     <router-link :to="item.path">
                         <div class="block"></div>
                         <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-029747aa="">
@@ -15,25 +15,39 @@
             </ul>
         </div>
         <div class="user-part">
-            <Personal :imgUrl="userStore.userImg" :online="userStore.online" @click="showPersonalConfig" />
+            <Personal :imgUrl="userStore.userImg" :online="userStore.online" @click="showPersonalConfig"
+                :showOnline="true" />
         </div>
     </div>
     <Information v-if="configShow" @showPersonalConfig="showPersonalConfig"></Information>
 </template>
   
 <script setup>
-import { ref } from 'vue'
-import Personal from './Personal.vue'
-import routerSvg from '../localData/routerSvg'
+import { ref, onMounted, onUnmounted } from 'vue'
+import Personal from '../personal/Personal.vue'
+import routerSvg from '../../localData/routerSvg'
 import { userInfoStore } from '@/store/userStore'
-import Information from './Information.vue';
+import { navInfoStore } from '@/store/navStore'
+import Information from '../information/Information.vue';
 const userStore = new userInfoStore()
-const current = ref(0)
+const navStore = new navInfoStore()
 let configShow = ref(false)
-const changeMenu = function (index) {
-    current.value = index;
+// 发送登录状态
+const sendBreakage = async () => {
+    const blob = new Blob([JSON.stringify({ username: userStore.username })], {
+        type: 'application/x-www-form-urlencoded; charset=UTF-8'
+    })
+    navigator.sendBeacon('http://localhost:3007/api/breakage', blob)
 }
 const showPersonalConfig = () => configShow.value = !configShow.value
+onMounted(async () => {
+    await userStore.getUserInfo()
+    navStore.changeMenu(sessionStorage.getItem('current'))
+    window.addEventListener('unload', sendBreakage)
+})
+onUnmounted(() => {
+    window.removeEventListener('unload', sendBreakage)
+})
 
 </script>
   
@@ -53,7 +67,7 @@ const showPersonalConfig = () => configShow.value = !configShow.value
     .nav-menu {
         display: flex;
         flex: 3;
-        align-items: flex-end;
+        align-items: inherit;
 
         li {
             list-style: none;

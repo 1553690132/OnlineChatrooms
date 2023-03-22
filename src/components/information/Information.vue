@@ -72,7 +72,7 @@ onMounted(() => {
     width: 380px;
     height: 460px;
     transform: translate(-50%, -50%);
-    z-index: 10;
+    z-index: 15;
     padding: 10px;
     box-sizing: border-box;
 

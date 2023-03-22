@@ -1,5 +1,5 @@
 <template>
-    <div class="personal" :class="{ online: online }">
+    <div class="personal" :class="{ online: online, showOnline: showOnline }">
         <el-avatar :src="imgUrl" :size="45"></el-avatar>
     </div>
 </template>
@@ -8,7 +8,8 @@
 import { defineProps } from 'vue'
 const props = defineProps({
     imgUrl: String,
-    online: Boolean
+    online: Boolean,
+    showOnline: Boolean
 })
 </script>
 
@@ -26,12 +27,19 @@ const props = defineProps({
         top: 0;
         right: 0;
         z-index: 100;
+        display: none;
     }
 }
 
 .online {
     &::before {
         background-color: rgb(144, 225, 80) !important;
+    }
+}
+
+.showOnline {
+    &::before {
+        display: block;
     }
 }
 </style>

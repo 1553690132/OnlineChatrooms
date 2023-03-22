@@ -3,11 +3,14 @@
         <div class="top-part">
             <div class="infos">
                 <div class="head-sculpture">
-                    <Personal :imgUrl="windowStore.chatWindowInfo.headImg" :online="windowStore.chatWindowInfo.online">
+                    <Personal v-if="chatWay" :imgUrl="windowStore.chatWindowInfo.headImg" :showOnline="false">
                     </Personal>
+                    <div class="avatar" ref="avatar" v-else>
+                        <span>群</span>
+                    </div>
                 </div>
                 <div class="info-detail">
-                    <div class="info-name">{{ windowStore.chatWindowInfo.nickname }}</div>
+                    <div class="info-name">{{ _name }}</div>
                     <div class="info-sculpture">{{ windowStore.chatWindowInfo.detail }}</div>
                 </div>
             </div>
@@ -26,12 +29,12 @@
         </div>
         <div class="bottom-part" v-loading="loading.isLoading" element-loading-background="rgba(0, 0, 0, 0.7)">
             <div class="chat-content" ref="chatPart">
-                <div class="chat-wrapper" v-for="item in chatMsg" :key="item.id">
+                <div class="chat-wrapper" v-for="item in chatMsg" :key="item._id">
                     <div class="chat-friend" v-if="item.username !== userStore.username">
-                        <ChatArea :item="item"></ChatArea>
+                        <ChatArea :item="item" :chatWay="chatWay"></ChatArea>
                     </div>
                     <div class="chat-me" v-else>
-                        <ChatArea :item="item"></ChatArea>
+                        <ChatArea :item="item" :chatWay="chatWay"></ChatArea>
                     </div>
                 </div>
             </div>
@@ -49,21 +52,22 @@
             </div>
         </div>
     </div>
-    <CameraTake v-if="cameraShow" @showCamera="showCamera"></CameraTake>
+    <CameraTake v-if="cameraShow" @showCamera="showCamera" @sendMsg="sendMsg"></CameraTake>
     <Location v-if="locationShow" @showLocation="showLocation" @sendLocation="sendLocation"></Location>
 </template> 
 <script setup>
-import Personal from '@/components/Personal.vue';
-import ChatArea from '@/components/ChatArea.vue'
-import CameraTake from '@/components/CameraTake.vue'
-import Location from '@/components/Location.vue';
-import Emoji from '@/components/Emoji.vue';
-import { ref, watch, onMounted, reactive, nextTick } from 'vue';
+import Personal from '@/components/personal/Personal.vue';
+import ChatArea from '@/components/chats/ChatArea.vue'
+import CameraTake from '@/components/camera/CameraTake.vue'
+import Location from '@/components/location/Location.vue';
+import Emoji from '@/components/chats/Emoji.vue';
+import { ref, watch, onMounted, reactive, nextTick, defineProps, computed } from 'vue';
 import { animationScroll } from '@/tools/index'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { chatWindowStore } from '@/store/chatWindowStore';
 import { userInfoStore } from '@/store/userStore';
 import { loadingStore } from '@/store/lodingStore';
+import { groupChatInfoStore } from '@/store/groupChat';
 import qs from 'qs';
 import $axios from '@/api';
 import socket from '@/tools/socket';
@@ -71,11 +75,16 @@ import axios from 'axios';
 const windowStore = chatWindowStore()
 const userStore = userInfoStore()
 const loading = loadingStore()
+const groupChatStore = groupChatInfoStore()
+const avatar = ref(null), headImg = ref('')
 let showEmojiList = ref(false), chatMsg = reactive([])
 let cameraShow = ref(false), locationShow = ref(false)
-const chooseEmoji = () => showEmojiList.value = !showEmojiList.value
+const props = defineProps({ chatWay: Boolean })
+const _name = computed(() => { return props.chatWay ? windowStore.chatWindowInfo.nickname : windowStore.chatWindowInfo.groupName })
 
-// 切换时更新窗口聊天数据
+
+const chooseEmoji = () => showEmojiList.value = !showEmojiList.value
+// 切换时更新窗口个人聊天数据
 const updateMsg = async (info) => {
     loading.showLoading
     let { data: res } = await $axios.get('chat/gain', { params: { sid: userStore._id, rid: info._id } })
@@ -95,18 +104,40 @@ const updateMsg = async (info) => {
     chatMsg.forEach(e => { if (e.chatType === 1 && e.imgType === 2) thumbnail.push(e.msg) })
     scrollBottom()
 }
+// 更新群组消息
+const updateGroupMsg = async info => {
+    await groupChatStore.getGroupChatList()
+    chatMsg.length = 0
+    const msgs = groupChatStore.getChatInfo(info)
+    chatMsg.push(...msgs)
+    scrollBottom()
+}
 
 onMounted(() => {
-    updateMsg(windowStore.chatWindowInfo)
-    socket.on('upMsg', (data) => {
-        chatMsg.push(data.msg)
-        scrollBottom()
-    })
+    if (props.chatWay) {
+        updateMsg(windowStore.chatWindowInfo)
+        socket.on('upMsg', (data) => {
+            chatMsg.push(data.msg)
+            scrollBottom()
+        })
+    } else {
+        setBackgroundColor()
+        updateGroupMsg(windowStore.chatWindowInfo.gid)
+        socket.on('upGroupMsg', data => {
+            chatMsg.push(data.msg)
+            scrollBottom()
+        })
+    }
 })
 
 watch(() => windowStore.chatWindowInfo, () => {
-    updateMsg(windowStore.chatWindowInfo)
-})
+    if (props.chatWay) {
+        updateMsg(windowStore.chatWindowInfo)
+    } else {
+        updateGroupMsg(windowStore.chatWindowInfo.gid)
+        setBackgroundColor()
+    }
+}, { deep: true })
 
 // 获取窗口高度并滑动至最底层
 const chatPart = ref(null) //vue3获取原生dom对象
@@ -155,21 +186,35 @@ const sendMsg = async (msgs, type = '') => {
         scrollBottom()
         return;
     } else {
-        console.log(msgs);
         chats = JSON.stringify({ ...msgs })
     }
 
-    socket.emit('privateChat', {
-        sid: userStore._id,
-        rid: windowStore.chatWindowInfo._id,
-        msg: chats,
-    })
-    const { data: res } = await $axios.post('chat/send', { sid: userStore._id, rid: windowStore.chatWindowInfo._id, chats })
-    if (res.status !== 200) return ElMessage({ type: 'error', message: res.message })
-    // 发送后重新获取
-    updateMsg(windowStore.chatWindowInfo)
-    userStore.listSort(windowStore.chatWindowInfo._id)
-    scrollBottom()
+    if (props.chatWay) {
+        socket.emit('privateChat', {
+            sid: userStore._id,
+            rid: windowStore.chatWindowInfo._id,
+            msg: chats,
+        })
+
+        const { data: res } = await $axios.post('chat/send', { sid: userStore._id, rid: windowStore.chatWindowInfo._id, chats })
+        if (res.status !== 200) return ElMessage({ type: 'error', message: res.message })
+        // 发送后重新获取
+        updateMsg(windowStore.chatWindowInfo)
+        userStore.listSort(windowStore.chatWindowInfo._id)
+        scrollBottom()
+    } else {
+        chats = JSON.stringify({ ...JSON.parse(chats), headImg: userStore.userImg })
+        socket.emit('groupChat', {
+            sid: userStore._id,
+            rid: windowStore.chatWindowInfo._id,
+            msg: chats
+        })
+        const { data: res } = await $axios.post('groupChat/send', { gid: windowStore.chatWindowInfo._id, message: chats })
+        if (res.status !== 200) return ElMessage.error('fail!')
+        updateGroupMsg(windowStore.chatWindowInfo.gid)
+        scrollBottom()
+    }
+
 }
 
 // 发送表情
@@ -201,12 +246,10 @@ const sendPicture = (e) => {
     }
     let fileName = e.target.files[0]
     if (!e || !window.FileReader) return // 是否支持file Reader
-    console.log(fileName);
     let reader = new FileReader()
     reader.readAsDataURL(fileName)
     reader.addEventListener('loadend', function () {
         newMsg.msg = this.result
-        console.log(newMsg);
         sendMsg(newMsg, 'image')
     })
     e.target.fileName = null
@@ -293,6 +336,11 @@ const sendLocation = () => {
         sendMsg(newMsg)
     }
     showLocation()
+}
+
+const setBackgroundColor = () => {
+    const color = sessionStorage.getItem('backgroundColor')
+    avatar.value.style.backgroundColor = color
 }
 
 </script>
@@ -454,6 +502,21 @@ const sendLocation = () => {
                     box-shadow: 0 0 10px 0 rgb(0, 136, 255);
                 }
             }
+        }
+    }
+
+    .avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background-color: #5079d3;
+        text-align: center;
+
+        span {
+            color: #fff;
+            font-weight: 700;
+            line-height: 45px;
+            font-size: 20px;
         }
     }
 }

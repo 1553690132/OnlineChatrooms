@@ -10,8 +10,8 @@ export const userInfoStore = defineStore('userInfoStore', {
             nickname: '',
             userImg: '',
             detail: '',
-            friendList: [],
-            online: false
+            chatFriendList: [],
+            online: false,
         }
     },
     actions: {
@@ -24,9 +24,9 @@ export const userInfoStore = defineStore('userInfoStore', {
                 this.nickname = res.data.user.nickname
                 this.userImg = res.data.user.headImg
                 this.detail = res.data.user.detail
-                this.friendList = []
-                this.friendList.push(...res.data.friendList)
-                this.friendList.sort((a, b) => {
+                this.chatFriendList = []
+                this.chatFriendList.push(...res.data.chatFriendList)
+                this.chatFriendList.sort((a, b) => {
                     return b.lastTime - a.lastTime
                 })
                 this.online = true
@@ -36,15 +36,15 @@ export const userInfoStore = defineStore('userInfoStore', {
             }
         },
         listSort(id) {
-            if (this.friendList[0]._id !== id) {
+            if (this.chatFriendList[0]._id !== id) {
                 let nowInfo;
-                for (let i = 0; i < this.friendList.length; i++) {
-                    if (id === this.friendList[i]._id) {
-                        nowInfo = this.friendList[i]
-                        this.friendList.splice(i, 1)
+                for (let i = 0; i < this.chatFriendList.length; i++) {
+                    if (id === this.chatFriendList[i]._id) {
+                        nowInfo = this.chatFriendList[i]
+                        this.chatFriendList.splice(i, 1)
                     }
                 }
-                this.friendList.unshift(nowInfo)
+                this.chatFriendList.unshift(nowInfo)
             }
         },
     }

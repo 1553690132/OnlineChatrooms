@@ -1,7 +1,5 @@
 import Comment from "../view/pages/comment/comment.vue"
-import Video from "../view/pages/video.vue"
-import Friends from "../view/pages/friends.vue"
-import Remind from "../view/pages/remind.vue"
+import Friends from "../view/pages/friend/friends.vue"
 import Setting from "../view/pages/settting/setting.vue"
 import Login from '../view/Login.vue'
 import Home from "@/view/home.vue"
@@ -30,22 +28,16 @@ const router = createRouter({
                 {
                     path: 'comment',
                     component: Comment,
-                    name: 'Comment'
-                },
-                {
-                    path: 'video',
-                    component: Video,
-                    name: 'Video'
+                    name: 'Comment',
+                    beforeEnter(to, form, next) {
+                        sessionStorage.setItem('current', 0)
+                        next()
+                    }
                 },
                 {
                     path: 'friends',
                     component: Friends,
                     name: 'Friends'
-                },
-                {
-                    path: 'remind',
-                    component: Remind,
-                    name: 'Remind'
                 },
                 {
                     path: 'setting',

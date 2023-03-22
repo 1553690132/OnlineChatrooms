@@ -18,8 +18,10 @@ import { ref, onMounted, defineEmits } from 'vue'
 import { turnOnCamera, shutter, download, changePhotoPart } from '@/tools/index'
 import { Check, Delete } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
+import { userInfoStore } from '@/store/userStore';
 const _video = ref(null), _canvas = ref(null), isSend = ref(false)
-const emit = defineEmits(['showCamera'])
+const userStore = userInfoStore()
+const emit = defineEmits(['showCamera', 'sendMsg'])
 onMounted(() => {
     turnOnCamera(_video.value)
 })
@@ -35,7 +37,16 @@ const closeCamera = () => {
 const savePhoto = () => {
     download(_canvas.value)
     changePhotoPart(false, _canvas.value, _video.value)
-    isSend.value = false
+    const newMsg = {
+        username: userStore.username,
+        time: new Date().getTime(),
+        msg: _canvas.value.toDataURL(),
+        chatType: 1,
+        extend: {
+            imgType: 2
+        }
+    }
+    emit('sendMsg', newMsg, 'image')
     ElMessage({ message: '已成功保存至本地！', type: 'success' })
     emit('showCamera')
 }

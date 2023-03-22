@@ -1,28 +1,39 @@
 <template>
-    <div class="friendCard" :class="{ activeCard: props.chatFriendInfo._id == windowStore.preCurrent }">
+    <div class="groupCard" ref="groupCard" :class="{ activeCard: groupChatInfo._id == windowStore.preCurrent }"
+        @click="setColor">
         <div class="info">
-            <Personal :imgUrl="props.chatFriendInfo.headImg" :online="props.chatFriendInfo.online"></Personal>
+            <div class="info-avatar">
+                <div class="avatar" ref="avatar">
+                    <span>群</span>
+                </div>
+            </div>
             <div class="info-msg">
-                <div class="name">{{ props.chatFriendInfo.nickname }}</div>
-                <div class="detail">{{ props.chatFriendInfo.detail }}</div>
+                <div class="name">{{ groupChatInfo.groupName }}</div>
             </div>
         </div>
     </div>
 </template>
 <script setup>
-import { defineProps } from 'vue';
-import {chatWindowStore } from '@/store/chatWindowStore'
-import Personal from '@/components/Personal.vue'
+import { defineProps, ref, onMounted } from 'vue';
+import { generateRandomColors } from '@/tools/index'
+import { chatWindowStore } from '@/store/chatWindowStore';
 const windowStore = chatWindowStore()
-const props = defineProps({
-    chatFriendInfo: Object,
+const props = defineProps({ groupChatInfo: Object })
+const avatar = ref(null)
+onMounted(() => {
+    generateRandomColors(avatar.value)
 })
+
+const setColor = () => {
+    sessionStorage.setItem('backgroundColor', avatar.value.style.backgroundColor)
+}
+
 </script>
 <style lang="less" scoped>
 @normal-color: #1d90f5;
 @shadow-color: rgb(0, 136, 255);
 
-.friendCard {
+.groupCard {
     position: relative;
     min-width: 250px;
     min-height: 80px;
@@ -40,6 +51,24 @@ const props = defineProps({
         width: 90%;
         transform: translate(-50%, -50%);
         overflow: hidden;
+        align-items: center;
+
+        .info-avatar {
+            .avatar {
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                background-color: #5079d3;
+                text-align: center;
+
+                span {
+                    color: #fff;
+                    font-weight: 700;
+                    line-height: 45px;
+                    font-size: 20px;
+                }
+            }
+        }
 
         .info-msg {
             margin: 5px 0 0 20px;

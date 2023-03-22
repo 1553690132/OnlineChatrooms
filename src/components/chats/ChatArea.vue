@@ -3,7 +3,7 @@
         <span class="item_time">{{ item.time }}</span>
     </div>
     <div class="item_info" v-else>
-        <img :src="windowStore.chatWindowInfo.headImg" alt="headimg">
+        <img :src="avatar" alt="headimg">
     </div>
 
     <!-- 文字内容 -->
@@ -12,8 +12,8 @@
     }}</div>
     <div class="chat-img" v-if="item.chatType == 1">
         <img :src="item.msg" alt="emoji" v-if="item.extend.imgType == 1">
-        <el-image style="max-width: 300px; border-radius: 10px; margin: 0 20px;" :src="srcs"
-            :preview-src-list="[srcs]" v-else></el-image>
+        <el-image style="max-width: 300px; border-radius: 10px; margin: 0 20px;" :src="srcs" :preview-src-list="[srcs]"
+            v-else></el-image>
     </div>
     <div class="chat-img" v-if="item.chatType == 2">
         <div class="word-file">
@@ -32,20 +32,30 @@
     </div>
 </template>
 <script setup>
-import { defineProps, ref, computed } from 'vue';
+import { onMounted, defineProps, ref, computed } from 'vue';
 import { userInfoStore } from '@/store/userStore'
 import { chatWindowStore } from '@/store/chatWindowStore';
 import FileCard from './FileCard.vue';
-import LocationCard from './LocationCard.vue';
+import LocationCard from '../location/LocationCard.vue';
 const userStore = userInfoStore()
 const windowStore = chatWindowStore()
 const props = defineProps({
     item: Object,
+    chatWay: Boolean
 })
 const srcs = computed(() => {
     return props.item.extend.imgType === 2 ? Object.keys(props.item.msg)[0].replaceAll(' ', '+') : ""
 })
+const avatar = computed(() => {
+    return props.chatWay ? windowStore.chatWindowInfo.headImg : props.item.headImg
+})
 const showTime = ref(false)
+
+onMounted(async () => {
+    if (!props.chatWay) {
+
+    }
+})
 </script>
 <style lang="less" scoped>
 .chat-friend {

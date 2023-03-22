@@ -5,18 +5,27 @@
                 <h1>摸鱼聊天室</h1>
             </div>
             <div class="chatting">
-                <span class="chat-title">聊天列表</span>
+                <div class="chat-t">
+                    <span class="chat-title">聊天列表</span>
+                    <el-switch v-model="chatWay" active-text="好友聊天" inactive-text="群聊"
+                        style="--el-switch-on-color:#3f90f6; --el-switch-off-color: #13ce66" size="large"
+                        @change="windowStore.clearStatus" />
+                </div>
                 <div class="chat-list">
-                    <div class="friend-list" v-for="chatFriendInfo in userStore.friendList" :key="chatFriendInfo._id"
-                        @click="windowStore.chooseChat(chatFriendInfo)">
+                    <div class="friend-list" v-if="chatWay" v-for="chatFriendInfo in userStore.chatFriendList"
+                        :key="chatFriendInfo._id" @click="windowStore.chooseChat(chatFriendInfo)">
                         <FriendCard :chatFriendInfo="chatFriendInfo"></FriendCard>
+                    </div>
+                    <div class="group-list" v-else v-for="groupChatInfo in groupChatStore.groupChatList"
+                        :key="groupChatInfo._id" @click="windowStore.chooseChat(groupChatInfo)">
+                        <GroupCard :groupChatInfo="groupChatInfo"></GroupCard>
                     </div>
                 </div>
             </div>
         </div>
         <div class="chatRight">
             <div v-if="windowStore.showChatWindow">
-                <chatWindow></chatWindow>
+                <chatWindow :chatWay="chatWay"></chatWindow>
             </div>
             <div class="showIcon" v-else>
                 <img src="@/assets/img/index.png">
@@ -26,38 +35,35 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
-import FriendCard from '@/components/FriendCard.vue'
+import { onMounted, onUnmounted, ref } from 'vue'
+import FriendCard from '@/components/friend/FriendCard.vue'
 import chatWindow from './chatWindow.vue'
+import GroupCard from '@/components/group/GroupCard.vue'
 import { userInfoStore } from '@/store/userStore';
 import { chatWindowStore } from '@/store/chatWindowStore';
+import { groupChatInfoStore } from '@/store/groupChat';
 import socket from '@/tools/socket';
 const userStore = userInfoStore()
 const windowStore = chatWindowStore()
-const sendBreakage = async () => {
-    const blob = new Blob([JSON.stringify({ username: userStore.username })], {
-        type: 'application/x-www-form-urlencoded; charset=UTF-8'
-    })
-    navigator.sendBeacon('http://localhost:3007/api/breakage', blob)
-}
+const groupChatStore = groupChatInfoStore()
+const chatWay = ref(true)
 const timer = setInterval(() => {
     userStore.getUserInfo()
 }, 5000)
 
 // 异步绑定uid值作为后端判断依据
-onMounted(() => {
-    userStore.getUserInfo()
+onMounted(async () => {
+    await userStore.getUserInfo()
+    await groupChatStore.getGroupChatList()
     socket.on('connect', async () => {
-        userStore.getUserInfo()
         const _id = await userStore.getUserInfo()
         socket.emit('logins', _id)
     })
     timer
-    window.addEventListener('unload', sendBreakage)
 })
 
 onUnmounted(() => {
-    window.removeEventListener('unload', sendBreakage)
+    windowStore.clearStatus()
     clearInterval(timer)
 })
 
@@ -69,7 +75,7 @@ onUnmounted(() => {
     display: flex;
 
     .chatLeft {
-        min-width: 280px;
+        min-width: 300px;
 
         .title {
             color: #fff;
@@ -77,7 +83,22 @@ onUnmounted(() => {
         }
 
         .chatting {
-            margin-top: 90px;
+            margin-top: 70px;
+
+            .chat-t {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                :deep(.el-switch__label) {
+                    color: #282a37;
+                    font-weight: 600;
+                }
+
+                :deep(.is-active) {
+                    color: #3f90f6 !important;
+                }
+            }
 
             .chat-title {
                 padding-left: 10px;
@@ -85,6 +106,8 @@ onUnmounted(() => {
                 color: rgb(209, 211, 222);
                 font-family: SimHei;
             }
+
+
 
             .chat-list {
                 box-sizing: border-box;
