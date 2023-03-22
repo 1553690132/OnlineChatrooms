@@ -1,5 +1,6 @@
 import { defineStore } from "pinia"
 import $axios from "@/api"
+import { userInfoStore } from "./userStore"
 
 export const chatWindowStore = defineStore('chatWindowStore', {
     state: () => {
@@ -10,7 +11,8 @@ export const chatWindowStore = defineStore('chatWindowStore', {
         }
     },
     actions: {
-        chooseChat(info) {
+        async chooseChat(info) {
+            await this.alreadyRead(info._id)
             this.preCurrent = info._id
             this.showChatWindow = true
             this.chatWindowInfo = info
@@ -20,5 +22,11 @@ export const chatWindowStore = defineStore('chatWindowStore', {
             this.preCurrent = ''
             this.showChatWindow = false
         },
+
+        async alreadyRead(sid) {
+            const userStore = userInfoStore()
+            const { data: res } = await $axios.post('chat/reading', { sid, rid: userStore._id })
+            if (res.status == 200) await userStore.getUserInfo()
+        }
     }
 })

@@ -6,15 +6,24 @@
             <span class="sex"><el-icon :class="{ female: sex }">
                     <Avatar />
                 </el-icon> {{ item.location }}</span>
-            <button class="addBtn">加好友</button>
+            <button class="addBtn" @click="addFriend">加好友</button>
         </div>
     </div>
 </template>
 
 <script setup>
+import $axios from '@/api';
+import { userInfoStore } from '@/store/userStore';
+import { ElMessage } from 'element-plus';
 import { defineProps, computed } from 'vue';
 const props = defineProps({ item: Object })
+const userStore = userInfoStore()
 const sex = computed(() => { return props.item.sex === '女' ? true : false })
+const addFriend = async () => {
+    const { data: res } = await $axios.post('friend//increase', { _id: userStore._id, friendName: props.item.username })
+    if (res.status !== 200) return ElMessage.error(res.message)
+    return ElMessage.success('添加成功!')
+}
 </script>
 
 <style lang="less" scoped>
@@ -27,8 +36,8 @@ const sex = computed(() => { return props.item.sex === '女' ? true : false })
     align-items: center;
 
     img {
-        width: 60px;
-        height: 60px;
+        width: 65px;
+        height: 65px;
         border-radius: 6px;
         margin-right: 18px;
     }
@@ -46,7 +55,7 @@ const sex = computed(() => { return props.item.sex === '女' ? true : false })
             display: flex;
             align-items: center;
             font-size: 14px;
-            
+
 
             :deep(.el-icon) {
                 margin-right: 10px;
@@ -59,8 +68,9 @@ const sex = computed(() => { return props.item.sex === '女' ? true : false })
             color: #fff;
             border: none;
             max-width: 80px;
-            height: 20px;
+            height: 24px;
             border-radius: 4px;
+            margin-top: 4px;
             cursor: pointer;
 
             &:hover {

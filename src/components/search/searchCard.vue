@@ -38,7 +38,6 @@ const inquireAbout = async () => {
     searchResult.value = []
     if (res.message instanceof Array) searchResult.value.push(...res.message)
     else searchResult.value.push(res.message)
-    console.log(searchResult.value);
 }
 </script>
 

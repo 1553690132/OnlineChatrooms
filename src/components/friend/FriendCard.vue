@@ -1,5 +1,6 @@
 <template>
-    <div class="friendCard" ref="friendCard" :class="{ activeCard: chatFriendInfo._id == windowStore.preCurrent }">
+    <div class="friendCard" ref="friendCard"
+        :class="{ activeCard: chatFriendInfo._id == windowStore.preCurrent, unread: !chatFriendInfo.isread }">
         <div class="info">
             <Personal :imgUrl="chatFriendInfo.headImg" :online="chatFriendInfo.online" :showOnline="true"></Personal>
             <div class="info-msg">
@@ -154,6 +155,21 @@ const hideChat = () => {
         .time {
             color: #fff !important;
         }
+    }
+}
+
+.unread {
+    &::after {
+        content: "";
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background-color: #FF0033;
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        z-index: 100;
+        border: none;
     }
 }
 </style>

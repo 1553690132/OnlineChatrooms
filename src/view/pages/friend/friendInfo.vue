@@ -81,10 +81,10 @@ const submitDivide = () => {
 }
 
 const sendMessageToFriend = () => {
-    $axios.post('/friendGroup/sendMsgTo', { uid: userStore._id, friendName: _friendInfoStore.friendInfo.username }).then(res => {
+    $axios.post('/friendGroup/sendMsgTo', { uid: userStore._id, friendName: _friendInfoStore.friendInfo.username }).then(async res => {
         if (res.status !== 200) return ElMessage.error('发生了一些错误!')
         router.push('/home/comment')
-        chatWindowInfoStore.chooseChat(_friendInfoStore.friendInfo)
+        await chatWindowInfoStore.chooseChat(_friendInfoStore.friendInfo)
         navStore.changeMenu(0)
     })
 }
@@ -102,6 +102,8 @@ const sendMessageToFriend = () => {
     .box-card {
         width: 100%;
         height: 100%;
+        background-color: #282a37;
+        border: none;
 
         .card-header {
             display: flex;
@@ -134,6 +136,7 @@ const sendMessageToFriend = () => {
                 .infos {
 
                     .username {
+                        color: #fff;
                         font-weight: 700;
                         margin: 5px 0;
                     }
@@ -141,6 +144,7 @@ const sendMessageToFriend = () => {
                     .occupation {
                         font-size: 12px;
                         margin: 5px 0;
+                        color: #fff;
                     }
 
                     .detail {
@@ -168,12 +172,20 @@ const sendMessageToFriend = () => {
 
                     .msg-title {
                         flex: 1;
-                        color: #8b8b8b;
+                        color: #d0d0d0;
                     }
 
                     .msg-body {
                         flex: 3;
-                        color: #000;
+                        color: #fff;
+
+                        :deep(.el-input__wrapper) {
+                            background-color: transparent !important;
+                        }
+
+                        :deep(.el-input__inner) {
+                            color: #fff !important;
+                        }
                     }
 
                     .divide {

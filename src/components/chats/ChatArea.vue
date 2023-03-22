@@ -6,22 +6,26 @@
         <img :src="avatar" alt="headimg">
     </div>
 
-    <!-- 文字内容 -->
-    <div class="chat-text" v-if="item.chatType == 0" @dblclick="showTime = !showTime" onselectstart="return false">{{
-        item.msg
-    }}</div>
-    <div class="chat-img" v-if="item.chatType == 1">
-        <img :src="item.msg" alt="emoji" v-if="item.extend.imgType == 1">
-        <el-image style="max-width: 300px; border-radius: 10px; margin: 0 20px;" :src="srcs" :preview-src-list="[srcs]"
-            v-else></el-image>
-    </div>
-    <div class="chat-img" v-if="item.chatType == 2">
-        <div class="word-file">
-            <FileCard :fileType="item.extend.fileType" :file="item.msg"></FileCard>
+    <div class="text-area">
+        <div class="nickname" v-if="item.username != userStore.username && !chatWay">{{ item.username }}</div>
+
+        <!-- 文字内容 -->
+        <div class="chat-text" v-if="item.chatType == 0" @dblclick="showTime = !showTime" onselectstart="return false">{{
+            item.msg
+        }}</div>
+        <div class="chat-img" v-if="item.chatType == 1">
+            <img :src="item.msg" alt="emoji" v-if="item.extend.imgType == 1">
+            <el-image style="max-width: 300px; border-radius: 10px; margin: 0 20px;" :src="srcs" :preview-src-list="[srcs]"
+                v-else></el-image>
         </div>
-    </div>
-    <div class="chat-img" v-if="item.chatType == 3">
-        <LocationCard :location="item.msg"></LocationCard>
+        <div class="chat-img" v-if="item.chatType == 2">
+            <div class="word-file">
+                <FileCard :fileType="item.extend.fileType" :file="item.msg"></FileCard>
+            </div>
+        </div>
+        <div class="chat-img" v-if="item.chatType == 3">
+            <LocationCard :location="item.msg"></LocationCard>
+        </div>
     </div>
 
     <div class="item_info" v-if="item.username === userStore.username">
@@ -59,10 +63,22 @@ onMounted(async () => {
 </script>
 <style lang="less" scoped>
 .chat-friend {
+    .text-area {
+        display: flex;
+        flex-direction: column;
+
+        .nickname {
+            font-size: 12px;
+            color: #d1d3de;
+            margin-left: 15px;
+            margin-bottom: 5px;
+        }
+    }
+
     .item_info {
         img {
-            width: 34px;
-            height: 34px;
+            width: 40px;
+            height: 40px;
             border-radius: 5px;
             vertical-align: middle;
         }
@@ -82,8 +98,9 @@ onMounted(async () => {
     }
 
     .chat-img {
+        margin-top: 10px;
         img {
-            margin-left: 20px !important;
+            margin-left: 16px !important;
             width: 100px;
             height: 100px;
         }
@@ -104,14 +121,15 @@ onMounted(async () => {
 }
 
 .chat-me {
+
     .item_info {
         display: flex;
         align-self: flex-start;
 
 
         img {
-            width: 34px;
-            height: 34px;
+            width: 40px;
+            height: 40px;
             border-radius: 5px;
             vertical-align: middle;
         }

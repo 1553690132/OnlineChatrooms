@@ -201,6 +201,7 @@ const sendMsg = async (msgs, type = '') => {
         // 发送后重新获取
         updateMsg(windowStore.chatWindowInfo)
         userStore.listSort(windowStore.chatWindowInfo._id)
+        await windowStore.alreadyRead(windowStore.chatWindowInfo._id)
         scrollBottom()
     } else {
         chats = JSON.stringify({ ...JSON.parse(chats), headImg: userStore.userImg })
@@ -423,7 +424,7 @@ const setBackgroundColor = () => {
                 .chat-friend {
                     width: 100%;
                     display: flex;
-                    margin-bottom: 25px;
+                    margin-bottom: 30px;
                     flex-direction: row;
                     justify-content: flex-start;
                     align-items: flex-start;
