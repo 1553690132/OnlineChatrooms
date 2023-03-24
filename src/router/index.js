@@ -1,8 +1,8 @@
-import Comment from "../view/pages/comment/comment.vue"
-import Friends from "../view/pages/friend/friends.vue"
-import Setting from "../view/pages/settting/setting.vue"
-import Login from '../view/Login.vue'
-import Home from "@/view/home.vue"
+import Comment from "../view/pages/comment/comment.vue";
+import Friends from "../view/pages/friend/friends.vue";
+import Notice from '@/view/pages/notice/notice.vue';
+import Login from '../view/Login.vue';
+import Home from "@/view/home.vue";
 import { createRouter, createWebHistory } from "vue-router"
 
 const router = createRouter({
@@ -40,9 +40,9 @@ const router = createRouter({
                     name: 'Friends'
                 },
                 {
-                    path: 'setting',
-                    component: Setting,
-                    name: 'Setting',
+                    path: 'notice',
+                    component: Notice,
+                    name: 'Notice',
                 },
             ]
         },

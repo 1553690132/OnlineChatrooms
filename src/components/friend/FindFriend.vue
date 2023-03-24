@@ -17,11 +17,13 @@ import { userInfoStore } from '@/store/userStore';
 import { ElMessage } from 'element-plus';
 import { computed } from 'vue';
 const props = defineProps({ item: Object })
+const emit = defineEmits(['closeSearchCard'])
 const userStore = userInfoStore()
 const sex = computed(() => { return props.item.sex === '女' ? true : false })
 const addFriend = async () => {
-    const { data: res } = await $axios.post('friend//increase', { _id: userStore._id, friendName: props.item.username })
+    const { data: res } = await $axios.post('friend/increase', { _id: userStore._id, friendName: props.item.username })
     if (res.status !== 200) return ElMessage.error(res.message)
+    emit('closeSearchCard')
     return ElMessage.success('添加成功!')
 }
 </script>

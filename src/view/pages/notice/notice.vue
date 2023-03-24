@@ -1,6 +1,6 @@
-<template>
-    <h3>system</h3>
-</template>
+<template></template>
+
 <script setup>
 </script>
+
 <style lang="less" scoped></style>
