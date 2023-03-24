@@ -14,7 +14,6 @@
 <script setup>
 import CronyCard from '@/components/friend/CronyCard.vue';
 import { friendListInfoStore } from '@/store/friendList';
-import { defineEmits } from 'vue';
 const friendListStore = friendListInfoStore()
 const emit = defineEmits(['chooseFriendInfo'])
 </script>

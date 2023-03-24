@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-import { defineEmits, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { userInfoStore } from '@/store/userStore';
 import { infoStore } from '@/store/infoStore';
 import ConfigInfo from './ConfigInfo.vue';

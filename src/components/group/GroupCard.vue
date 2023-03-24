@@ -14,7 +14,7 @@
     </div>
 </template>
 <script setup>
-import { defineProps, ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { generateRandomColors } from '@/tools/index'
 import { chatWindowStore } from '@/store/chatWindowStore';
 const windowStore = chatWindowStore()

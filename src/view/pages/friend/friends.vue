@@ -8,7 +8,12 @@
                 <div class="search-part">
                     <el-input v-model="searchContext" :prefix-icon="Search" placeholder="搜索" @focus="focus" @blur="focus"
                         :class="{ actived: isFocus }" clearable></el-input>
-                    <el-button :icon="Plus" circle @click="showSearchPart" />
+                    <el-popconfirm title="请选择您的操作" icon="warning" confirm-button-text="加好友/加群" cancel-button-text="创建群聊"
+                        cancel-button-type="success" @confirm="showSearchPart" @cancel="showCreateGroup" width="200">
+                        <template #reference>
+                            <el-button :icon="Plus" circle />
+                        </template>
+                    </el-popconfirm>
                 </div>
                 <div class="friend-list">
                     <friendList />
@@ -27,20 +32,23 @@
             </div>
         </div>
     </div>
-    <searchCard @showSearchPart="showSearchPart" v-if="showSearch"></searchCard>
+    <SearchCard @showSearchPart="showSearchPart" v-if="showSearch"></SearchCard>
+    <CreateGroupCard @showCreateGroup="showCreateGroup" v-if="showCreateArea"></CreateGroupCard>
 </template>
 <script setup>
 import friendList from './friendList.vue';
 import friendInfo from './friendInfo.vue';
-import searchCard from '@/components/search/searchCard.vue';
+import SearchCard from '@/components/search/SearchCard.vue';
+import CreateGroupCard from '@/components/group/CreateGroupCard.vue';
 import { Plus, Search } from '@element-plus/icons-vue';
 import { friendListInfoStore } from '@/store/friendList';
 import { friendInfoStore } from '@/store/friendInfo';
 import { onMounted, onBeforeUnmount, ref } from 'vue';
 const friendListStore = friendListInfoStore()
 const _friendInfoStore = friendInfoStore()
-const searchContext = ref(''), isFocus = ref(false), showSearch = ref(false), showSearchArea = ref(false)
+const searchContext = ref(''), isFocus = ref(false), showSearch = ref(false), showSearchArea = ref(false), showCreateArea = ref(false)
 const showSearchPart = () => showSearch.value = !showSearch.value
+const showCreateGroup = () => showCreateArea.value = !showCreateArea.value
 onMounted(async () => {
     await friendListStore.getGroupList()
 })

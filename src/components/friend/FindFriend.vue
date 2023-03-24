@@ -15,7 +15,7 @@
 import $axios from '@/api';
 import { userInfoStore } from '@/store/userStore';
 import { ElMessage } from 'element-plus';
-import { defineProps, computed } from 'vue';
+import { computed } from 'vue';
 const props = defineProps({ item: Object })
 const userStore = userInfoStore()
 const sex = computed(() => { return props.item.sex === '女' ? true : false })

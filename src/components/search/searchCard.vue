@@ -20,7 +20,7 @@
 <script setup>
 import $axios from '@/api';
 import FindFriend from '../friend/FindFriend.vue';
-import { ref, defineEmits, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { Search } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 const emit = defineEmits(['showSearchPart'])

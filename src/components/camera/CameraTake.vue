@@ -14,7 +14,7 @@
     </div>
 </template>
 <script setup>
-import { ref, onMounted, defineEmits } from 'vue'
+import { ref, onMounted } from 'vue'
 import { turnOnCamera, shutter, download, changePhotoPart } from '@/tools/index'
 import { Check, Delete } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';

@@ -19,7 +19,7 @@
 </template>
 <script setup>
 import moment from 'moment'
-import { defineProps, ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { chatWindowStore } from '@/store/chatWindowStore';
 import { clickMenu } from '@/tools/menu'
 import { userInfoStore } from '@/store/userStore';

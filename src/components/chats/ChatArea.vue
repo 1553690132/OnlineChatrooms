@@ -36,7 +36,7 @@
     </div>
 </template>
 <script setup>
-import { onMounted, defineProps, ref, computed } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { userInfoStore } from '@/store/userStore'
 import { chatWindowStore } from '@/store/chatWindowStore';
 import FileCard from './FileCard.vue';
@@ -99,6 +99,7 @@ onMounted(async () => {
 
     .chat-img {
         margin-top: 10px;
+
         img {
             margin-left: 16px !important;
             width: 100px;

@@ -61,7 +61,7 @@ import ChatArea from '@/components/chats/ChatArea.vue'
 import CameraTake from '@/components/camera/CameraTake.vue'
 import Location from '@/components/location/Location.vue';
 import Emoji from '@/components/chats/Emoji.vue';
-import { ref, watch, onMounted, reactive, nextTick, defineProps, computed } from 'vue';
+import { ref, watch, onMounted, reactive, nextTick, computed } from 'vue';
 import { animationScroll } from '@/tools/index'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { chatWindowStore } from '@/store/chatWindowStore';

@@ -26,7 +26,7 @@
 
 <script setup>
 import { ElMessage } from 'element-plus';
-import { defineEmits, ref } from 'vue';
+import { ref } from 'vue';
 import AvatarDialog from './AvatarDialog.vue'
 const emit = defineEmits(['showHeadImgConfig'])
 const dialogVisible = ref(true), avatarUrl = ref('')

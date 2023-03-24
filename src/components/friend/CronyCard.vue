@@ -10,7 +10,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 import { friendInfoStore } from '@/store/friendInfo';
 const props = defineProps({ friends: Array, groupName: String })
 const _friendInfoStore = friendInfoStore()

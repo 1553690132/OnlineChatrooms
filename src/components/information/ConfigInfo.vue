@@ -53,7 +53,7 @@
 <script setup>
 import $axios from '@/api';
 import { ElMessage } from 'element-plus';
-import { defineEmits, onMounted, reactive } from 'vue';
+import { onMounted, reactive } from 'vue';
 import { userInfoStore } from '@/store/userStore';
 import { infoStore } from '@/store/infoStore';
 const emit = defineEmits(['showConfigInfoCard', 'showPersonalConfig'])

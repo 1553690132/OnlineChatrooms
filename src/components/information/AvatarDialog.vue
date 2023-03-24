@@ -31,7 +31,7 @@
 
 <script setup>
 import { ElMessage } from 'element-plus';
-import { defineEmits, ref, watch, defineProps } from 'vue';
+import { ref, watch } from 'vue';
 import { drawAvatar, changeAvatarSize } from '@/tools/avatar'
 import axios from 'axios';
 const emit = defineEmits(['changeDialog', 'showAvatarConfig'])

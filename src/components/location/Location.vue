@@ -9,7 +9,7 @@
 </template>
 <script setup>
 import { getLocations } from '@/tools';
-import { onMounted, defineEmits} from 'vue';
+import { onMounted } from 'vue';
 import { ElButton } from 'element-plus';
 import { Check, Close } from '@element-plus/icons-vue';
 const emit = defineEmits(['showLocation', 'sendLocation'])
