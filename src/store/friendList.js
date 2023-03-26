@@ -22,5 +22,14 @@ export const friendListInfoStore = defineStore('friendListInfoStore', {
                 return ElMessage({ type: 'error', error })
             }
         },
+        searchFriend(content) {
+            const result = []
+            this.groupList.forEach(e => {
+                e.users.forEach(el => {
+                    if (el.username.indexOf(content) !== -1) result.push(el)
+                })
+            })
+            return result
+        }
     }
 })

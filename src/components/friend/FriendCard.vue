@@ -1,6 +1,7 @@
 <template>
-    <div class="friendCard" ref="friendCard"
-        :class="{ activeCard: chatFriendInfo._id == windowStore.preCurrent, unread: !chatFriendInfo.isread }">
+    <div class="friendCard" ref="friendCard" :class="{ activeCard: chatFriendInfo._id == windowStore.preCurrent }">
+        <el-badge :value="chatFriendInfo.unreadNum" :max="99" class="item" v-if="!chatFriendInfo.isread">
+        </el-badge>
         <div class="info">
             <Personal :imgUrl="chatFriendInfo.headImg" :online="chatFriendInfo.online" :showOnline="true"></Personal>
             <div class="info-msg">
@@ -53,6 +54,15 @@ const hideChat = () => {
     margin: 25px 0;
     cursor: pointer;
     transition: .3s;
+
+    .item {
+        position: absolute;
+        right: 0;
+    }
+
+    :deep(.el-badge__content) {
+        border: none;
+    }
 
     .info {
         display: flex;

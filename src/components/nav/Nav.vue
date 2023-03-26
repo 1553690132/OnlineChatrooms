@@ -31,7 +31,7 @@ import { navInfoStore } from '@/store/navStore'
 import Information from '../information/Information.vue';
 const userStore = new userInfoStore()
 const navStore = new navInfoStore()
-let configShow = ref(false)
+const configShow = ref(false), times = ref(0), gap_times = ref(0)
 // 发送登录状态
 const sendBreakage = async () => {
     const blob = new Blob([JSON.stringify({ username: userStore.username })], {
@@ -40,13 +40,26 @@ const sendBreakage = async () => {
     navigator.sendBeacon('http://localhost:3007/api/breakage', blob)
 }
 const showPersonalConfig = () => configShow.value = !configShow.value
+const beforeHandler = () => {
+    times.value = new Date().getTime()
+}
+// 刷新误差大于五毫秒
+const unloadHandler = () => {
+    gap_times.value = new Date().getTime() - times.value
+    if (gap_times.value <= 5) {
+        console.log(123);
+        sendBreakage()
+    }
+}
 onMounted(async () => {
     await userStore.getUserInfo()
     navStore.changeMenu(sessionStorage.getItem('current'))
-    window.addEventListener('unload', sendBreakage)
+    window.addEventListener('beforeunload', beforeHandler)
+    window.addEventListener('unload', unloadHandler)
 })
 onUnmounted(() => {
-    window.removeEventListener('unload', sendBreakage)
+    window.removeEventListener('beforeunload', beforeHandler)
+    window.removeEventListener('unload', unloadHandler)
 })
 
 </script>

@@ -10,7 +10,7 @@ export const friendInfoStore = defineStore('friendInfoStore', {
         }
     },
     actions: {
-        async chooseFriendInfo(info, group) {
+        async chooseFriendInfo(info, group = '') {
             const _infoStore = infoStore()
             await _infoStore.getSpecificInfo(info.username)
             this.showFriendInfo = true

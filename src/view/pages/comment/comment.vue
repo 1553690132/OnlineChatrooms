@@ -16,7 +16,7 @@
                         :key="chatFriendInfo._id" @click="windowStore.chooseChat(chatFriendInfo)">
                         <FriendCard :chatFriendInfo="chatFriendInfo" :isread="chatFriendInfo.isread"></FriendCard>
                     </div>
-                    <div class="group-list" v-else v-for="groupChatInfo in groupChatStore.groupChatList"
+                    <div class="group-list" v-else v-for="groupChatInfo in groupChatStore.chatGroupChatList"
                         :key="groupChatInfo._id" @click="windowStore.chooseChat(groupChatInfo)">
                         <GroupCard :groupChatInfo="groupChatInfo"></GroupCard>
                     </div>

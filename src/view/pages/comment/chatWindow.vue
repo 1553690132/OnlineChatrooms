@@ -15,14 +15,25 @@
                 </div>
             </div>
             <div class="other-functions">
-                <LocationFilled @click="showLocation" />
-                <CameraFilled @click="sendCamera" />
+                <el-tooltip v-if="!chatWay" effect="dark" content="邀请加入群聊" placement="bottom">
+                    <MoreFilled @click="invitePeople" />
+                </el-tooltip>
+                <el-tooltip effect="dark" content="发送地址" placement="bottom">
+                    <LocationFilled @click="showLocation" />
+                </el-tooltip>
+                <el-tooltip effect="dark" content="拍照发送" placement="bottom">
+                    <CameraFilled @click="sendCamera" />
+                </el-tooltip>
                 <label for="img">
-                    <PictureFilled />
+                    <el-tooltip effect="dark" content="发送图片" placement="bottom">
+                        <PictureFilled />
+                    </el-tooltip>
                 </label>
                 <input type="file" id="img" accept="image/*" @change="sendPicture">
                 <label for="doc">
-                    <UploadFilled />
+                    <el-tooltip effect="dark" content="发送文件" placement="bottom">
+                        <UploadFilled />
+                    </el-tooltip>
                 </label>
                 <input type="file" id="doc" accept="application/*,text/*" @change="sendFile">
             </div>
@@ -54,12 +65,14 @@
     </div>
     <CameraTake v-if="cameraShow" @showCamera="showCamera" @sendMsg="sendMsg"></CameraTake>
     <Location v-if="locationShow" @showLocation="showLocation" @sendLocation="sendLocation"></Location>
+    <CreateGroupCard v-if="inviteShow" @invitePeople="invitePeople" :invite="inviteShow"></CreateGroupCard>
 </template> 
 <script setup>
 import Personal from '@/components/personal/Personal.vue';
 import ChatArea from '@/components/chats/ChatArea.vue'
 import CameraTake from '@/components/camera/CameraTake.vue'
 import Location from '@/components/location/Location.vue';
+import CreateGroupCard from '@/components/group/CreateGroupCard.vue';
 import Emoji from '@/components/chats/Emoji.vue';
 import { ref, watch, onMounted, reactive, nextTick, computed } from 'vue';
 import { animationScroll } from '@/tools/index'
@@ -77,8 +90,8 @@ const userStore = userInfoStore()
 const loading = loadingStore()
 const groupChatStore = groupChatInfoStore()
 const avatar = ref(null), headImg = ref('')
-let showEmojiList = ref(false), chatMsg = reactive([])
-let cameraShow = ref(false), locationShow = ref(false)
+const showEmojiList = ref(false), chatMsg = reactive([])
+const cameraShow = ref(false), locationShow = ref(false), inviteShow = ref(false)
 const props = defineProps({ chatWay: Boolean })
 const _name = computed(() => { return props.chatWay ? windowStore.chatWindowInfo.nickname : windowStore.chatWindowInfo.groupName })
 
@@ -344,6 +357,10 @@ const setBackgroundColor = () => {
     avatar.value.style.backgroundColor = color
 }
 
+const invitePeople = () => {
+    inviteShow.value = !inviteShow.value
+}
+
 </script>
 <style lang="less" scoped>
 .chatWindow {
@@ -388,6 +405,7 @@ const setBackgroundColor = () => {
                 width: 30px;
                 height: 30px;
                 margin-left: 30px;
+                border: none !important;
             }
 
             input {

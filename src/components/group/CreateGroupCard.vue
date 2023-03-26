@@ -1,6 +1,6 @@
 <template>
     <div class="createCard">
-        <el-dialog v-model="dialogVisible" title="创建群聊" draggable @close="closeCreateCard">
+        <el-dialog v-model="dialogVisible" :title="titles" draggable @close="closeCreateCard">
             <div class="dialog-body">
                 <div class="left-part">
                     <el-input v-model="searchContext" :prefix-icon="Search" placeholder="搜索" clearable></el-input>
@@ -8,13 +8,14 @@
                         <div class="collapse" v-for="items in friendListStore.groupList" :key="items.groupName">
                             <el-collapse-item :title="items.groupName">
                                 <div class="friend-part" v-for="item in items.users" :key="item._id">
-                                    <GroupCreateFriend :item="item" @addGroupMember="addGroupMember"></GroupCreateFriend>
+                                    <GroupCreateFriend :item="item" @addGroupMember="addGroupMember" :invite="invite">
+                                    </GroupCreateFriend>
                                 </div>
                             </el-collapse-item>
                         </div>
                     </el-collapse>
                 </div>
-                <div class="right-part">
+                <div class="right-part" v-if="!invite">
                     <span class="title">已选联系人：{{ member_length }}</span>
                     <div class="group-member">
                         <GroupCreateFriend :item="users_msg" :isChecked="true"></GroupCreateFriend>
@@ -37,18 +38,24 @@
 </template>
 
 <script setup>
+import router from '@/router';
 import GroupCreateFriend from './GroupCreateFriend.vue';
 import { Search } from '@element-plus/icons-vue';
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { userInfoStore } from '@/store/userStore';
 import { friendListInfoStore } from '@/store/friendList';
+import { chatWindowStore } from '@/store/chatWindowStore';
 import $axios from '@/api';
-import { async } from 'q';
 import { ElMessage } from 'element-plus';
+const props = defineProps({ invite: Boolean })
 const userStore = userInfoStore()
+const windowStore = chatWindowStore()
 const friendListStore = friendListInfoStore()
-const emit = defineEmits(['showCreateGroup'])
+const emit = defineEmits(['showCreateGroup', 'invitePeople'])
 const dialogVisible = ref(true), searchContext = ref(''), member_msg = ref([]), groupName = ref(''), isDisabled = ref(true)
+const titles = computed(() => {
+    return props.invite ? '邀请进群' : '创建群聊'
+})
 const users_msg = computed(() => {
     return { username: userStore.username, nickname: userStore.nickname, headImg: userStore.userImg }
 })
@@ -56,6 +63,7 @@ const member_length = computed(() => { return 1 + member_msg.value.length })
 const closeCreateCard = () => {
     dialogVisible.value = false
     emit('showCreateGroup')
+    emit('invitePeople')
 }
 const addGroupMember = (item, checked) => {
     if (checked) member_msg.value.push(item)
@@ -64,13 +72,31 @@ const addGroupMember = (item, checked) => {
     else isDisabled.value = true
 }
 const submitGroup = async () => {
-    if (groupName.value) {
+    if (props.invite) {
+        const { data: res } = await $axios.post('groupChat/invite', { gid: windowStore.chatWindowInfo.gid, members: JSON.stringify(member_msg.value) })
         dialogVisible.value = false
-        const res = await $axios.post('groupChat/create', { groupName: groupName.value, members: JSON.stringify(member_msg.value) })
-        console.log(res);
+        if (res.status !== 200) return ElMessage.error('邀请失败!')
+        router.go(0)
+        ElMessage.success('邀请成功!')
     }
-    else return ElMessage.error('群名不能为空!')
+    else {
+        if (groupName.value) {
+            const { data: res } = await $axios.post('groupChat/create', { groupName: groupName.value, members: JSON.stringify(member_msg.value) })
+            dialogVisible.value = false
+            if (res.status !== 200) return ElMessage.error('创建失败!')
+            router.go(0)
+            ElMessage.success('创建成功!')
+        }
+        else return ElMessage.error('群名不能为空!')
+    }
 }
+onMounted(async () => {
+    await friendListStore.getGroupList()
+    
+})
+onUnmounted(() => {
+    
+})
 </script>
 
 <style lang="less" scoped>
