@@ -34,10 +34,18 @@ const joinGroup = async () => {
 .search {
     width: 100% !important;
     background-color: #282a37 !important;
-    box-shadow: 0 0 5px 0 #5aa4ff !important;
+    box-shadow: 0 0 2px 0 #5aa4ff !important;
 
     .avatar {
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 16px !important;
+        line-height: 44px !important;
         background-color: #3f90f6 !important;
+    }
+
+    .add-btn  {
+        width: 50px !important;
     }
 
     .group-name {

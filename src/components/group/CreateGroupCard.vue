@@ -3,17 +3,23 @@
         <el-dialog v-model="dialogVisible" :title="titles" draggable @close="closeCreateCard">
             <div class="dialog-body">
                 <div class="left-part">
-                    <el-input v-model="searchContext" :prefix-icon="Search" placeholder="搜索" clearable></el-input>
-                    <el-collapse>
+                    <el-input v-model.lazy="searchContext" :prefix-icon="Search" placeholder="搜索" clearable
+                        @change="searchForFriend" @clear="closeSearchCard"></el-input>
+                    <el-collapse v-if="!searchResultShow">
                         <div class="collapse" v-for="items in friendListStore.groupList" :key="items.groupName">
                             <el-collapse-item :title="items.groupName">
                                 <div class="friend-part" v-for="item in items.users" :key="item._id">
-                                    <GroupCreateFriend :item="item" @addGroupMember="addGroupMember" :invite="invite">
+                                    <GroupCreateFriend :item="item" @addGroupMember="addGroupMember"
+                                        :member_msg="member_msg" :invite="invite">
                                     </GroupCreateFriend>
                                 </div>
                             </el-collapse-item>
                         </div>
                     </el-collapse>
+                    <div class="friend-part" v-else v-for="item in searchResults" :key="item._id">
+                        <GroupCreateFriend :item="item" @addGroupMember="addGroupMember" :member_msg="member_msg">
+                        </GroupCreateFriend>
+                    </div>
                 </div>
                 <div class="right-part" v-if="!invite">
                     <span class="title">已选联系人：{{ member_length }}</span>
@@ -41,7 +47,7 @@
 import router from '@/router';
 import GroupCreateFriend from './GroupCreateFriend.vue';
 import { Search } from '@element-plus/icons-vue';
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { userInfoStore } from '@/store/userStore';
 import { friendListInfoStore } from '@/store/friendList';
 import { chatWindowStore } from '@/store/chatWindowStore';
@@ -52,7 +58,7 @@ const userStore = userInfoStore()
 const windowStore = chatWindowStore()
 const friendListStore = friendListInfoStore()
 const emit = defineEmits(['showCreateGroup', 'invitePeople'])
-const dialogVisible = ref(true), searchContext = ref(''), member_msg = ref([]), groupName = ref(''), isDisabled = ref(true)
+const dialogVisible = ref(true), searchContext = ref(''), member_msg = ref([]), groupName = ref(''), isDisabled = ref(true), searchResults = ref([]), searchResultShow = ref(false)
 const titles = computed(() => {
     return props.invite ? '邀请进群' : '创建群聊'
 })
@@ -66,8 +72,8 @@ const closeCreateCard = () => {
     emit('invitePeople')
 }
 const addGroupMember = (item, checked) => {
-    if (checked) member_msg.value.push(item)
-    else member_msg.value.splice(member_msg.value.indexOf(item), 1)
+    if (checked && member_msg.value.indexOf(item) === -1) member_msg.value.push(item)
+    else if (!checked) member_msg.value.splice(member_msg.value.indexOf(item), 1)
     if (member_msg.value.length) isDisabled.value = false
     else isDisabled.value = true
 }
@@ -90,12 +96,17 @@ const submitGroup = async () => {
         else return ElMessage.error('群名不能为空!')
     }
 }
+const searchForFriend = () => {
+    if (searchContext.value) {
+        searchResultShow.value = true
+        searchResults.value = friendListStore.searchFriend(searchContext.value)
+    }
+}
+const closeSearchCard = () => {
+    searchResultShow.value = false
+}
 onMounted(async () => {
     await friendListStore.getGroupList()
-    
-})
-onUnmounted(() => {
-    
 })
 </script>
 

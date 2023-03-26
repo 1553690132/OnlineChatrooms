@@ -10,10 +10,10 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted, onUpdated } from 'vue'
 import { chatWindowStore } from '@/store/chatWindowStore';
 const windowStore = chatWindowStore()
-const props = defineProps({ item: Object, isChecked: Boolean, invite: Boolean })
+const props = defineProps({ item: Object, isChecked: Boolean, invite: Boolean, member_msg: Array })
 const emit = defineEmits(['addGroupMember'])
 const checked = ref(false), inviteChecked = ref(false)
 watch(checked, () => {
@@ -22,7 +22,22 @@ watch(checked, () => {
 watch(inviteChecked, () => {
     emit('addGroupMember', props.item, inviteChecked.value)
 })
-
+onMounted(() => {
+    changeCheck()
+})
+onUpdated(() => {
+    changeCheck()
+})
+const changeCheck = () => {
+    if (props.member_msg !== undefined) {
+        props.member_msg.forEach(e => {
+            if (props.item.username === e.username) {
+                checked.value = true
+                inviteChecked.value = true
+            }
+        })
+    }
+}
 const disabled = computed(() => {
     if (windowStore.chatWindowInfo.groupMembers) return windowStore.chatWindowInfo.groupMembers.indexOf(props.item.username) !== -1
 })

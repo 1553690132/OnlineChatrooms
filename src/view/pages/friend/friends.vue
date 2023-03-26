@@ -28,6 +28,9 @@
                         <div class="card-header">
                             <span>输入搜索</span>
                         </div>
+                        <el-icon>
+                            <Close @click="closeCard" />
+                        </el-icon>
                     </template>
                     <div class="searchResult">
                         <div class="friend-part" v-if="searchFriendResult.length">
@@ -98,10 +101,8 @@ const focus = () => {
     isFocus.value = true
     showSearchArea.value = true
 }
-const blur = () => {
-    isFocus.value = false
-    // showSearchArea.value = false
-}
+const blur = () => { isFocus.value = false }
+const closeCard = () => { showSearchArea.value = false }
 </script>
 <style lang="less" scoped>
 @normal-color: #282a37;
@@ -261,6 +262,18 @@ const blur = () => {
                     }
                 }
             }
+
+
+            :deep(.el-card__header) {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+
+                .el-icon {
+                    cursor: pointer;
+                }
+            }
+
         }
 
         .friend-right {

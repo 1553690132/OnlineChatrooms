@@ -48,11 +48,11 @@ const sendMessageToFriend = () => {
 <style lang="less" scoped>
 .search {
     width: 100% !important;
-    font-size: 14px !important;
+    font-size: 12px !important;
 
     img {
-        width: 50px !important;
-        height: 50px !important;
+        width: 44px !important;
+        height: 44px !important;
     }
 
     .addBtn {
