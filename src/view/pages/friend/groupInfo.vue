@@ -40,9 +40,11 @@ import $axios from '@/api';
 import router from '@/router';
 import { navInfoStore } from '@/store/navStore';
 import { groupChatInfoStore } from '@/store/groupChat';
+import { chatWindowStore } from '@/store/chatWindowStore';
 import { ElMessage } from 'element-plus';
 import { ref, onMounted, watch } from 'vue';
 const groupChatStore = groupChatInfoStore()
+const windowStore = chatWindowStore()
 const navStore = navInfoStore()
 const avatar = ref(null), starValue = ref(5)
 const setBackgroundColor = () => {
@@ -52,6 +54,8 @@ const sendGroupShow = () => {
     $axios.post('/groupChat/show', { gid: groupChatStore.groupChatInfos.gid }).then(async res => {
         if (res.status !== 200) return ElMessage.error('发生了一些错误')
         router.push('/home/comment')
+        sessionStorage.setItem('chatWay', false)
+        await windowStore.chooseChat(groupChatStore.groupChatInfos)
         navStore.changeMenu(0)
     })
 }

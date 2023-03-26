@@ -11,19 +11,38 @@
                 <div class="name">{{ groupChatInfo.groupName }}</div>
             </div>
         </div>
+        <ul class="menu" ref="menu">
+            <li @click="deleteChat">删除聊天</li>
+            <li @click="hideChat">不显示该聊天</li>
+        </ul>
     </div>
 </template>
 <script setup>
+import router from '@/router';
 import { ref, onMounted } from 'vue';
 import { generateRandomColors } from '@/tools/index'
 import { chatWindowStore } from '@/store/chatWindowStore';
+import { clickMenu } from '@/tools/menu';
+import $axios from '@/api';
+import { ElMessage } from 'element-plus';
 const windowStore = chatWindowStore()
 const props = defineProps({ groupChatInfo: Object })
-const avatar = ref(null)
+const avatar = ref(null), groupCard = ref(null), menu = ref(null)
 onMounted(() => {
     generateRandomColors(avatar.value)
+    clickMenu(groupCard.value, menu.value)
 })
-
+const deleteChat = () => {
+    return ElMessage.info('该功能开发中')
+}
+const hideChat = async () => {
+    const { data: res } = await $axios.put('/groupChat/hide', { gid: props.groupChatInfo.gid })
+    if (res.status === 200) {
+        windowStore.clearStatus()
+        sessionStorage.setItem('chatWay', false)
+        router.go(0)
+    }
+}
 const setColor = () => {
     sessionStorage.setItem('backgroundColor', avatar.value.style.backgroundColor)
 }
@@ -104,6 +123,34 @@ const setColor = () => {
                 }
             }
         }
+    }
+
+    .menu {
+        display: none;
+        position: absolute;
+        width: 150px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        padding: 5px;
+        border-radius: 4px;
+        box-shadow: 1px 1px 5px 1px #ccc;
+        background-color: #fff;
+        z-index: 10;
+        overflow: visible !important;
+    }
+
+    .menu li {
+        list-style: none;
+        font-size: 14px;
+        font-family: system-ui;
+        cursor: pointer;
+        height: 20px;
+        line-height: 20px;
+        padding: 8px;
+    }
+
+    .menu li:hover {
+        background-color: #dfdfdf;
     }
 }
 

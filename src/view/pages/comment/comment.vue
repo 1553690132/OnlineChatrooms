@@ -16,9 +16,17 @@
                         :key="chatFriendInfo._id" @click="windowStore.chooseChat(chatFriendInfo)">
                         <FriendCard :chatFriendInfo="chatFriendInfo" :isread="chatFriendInfo.isread"></FriendCard>
                     </div>
-                    <div class="group-list" v-else v-for="groupChatInfo in groupChatStore.chatGroupChatList"
+                    <div class="blank-part" v-if="!userStore.chatFriendList.length && chatWay">
+                        <img src="@/assets/img/blank.png" alt="blank">
+                        <h3>暂无消息</h3>
+                    </div>
+                    <div class="group-list" v-if="!chatWay" v-for="groupChatInfo in groupChatStore.chatGroupChatList"
                         :key="groupChatInfo._id" @click="windowStore.chooseChat(groupChatInfo)">
                         <GroupCard :groupChatInfo="groupChatInfo"></GroupCard>
+                    </div>
+                    <div class="blank-part" v-if="!groupChatStore.chatGroupChatList.length && !chatWay">
+                        <img src="@/assets/img/blank.png" alt="blank">
+                        <h3>暂无消息</h3>
                     </div>
                 </div>
             </div>
@@ -50,9 +58,12 @@ const chatWay = ref(true)
 const timer = setInterval(() => {
     userStore.getUserInfo()
 }, 5000)
-
 // 异步绑定uid值作为后端判断依据
 onMounted(async () => {
+    if (sessionStorage.getItem('chatWay')) {
+        chatWay.value = JSON.parse(sessionStorage.getItem('chatWay'))
+        sessionStorage.removeItem('chatWay')
+    }
     await userStore.getUserInfo()
     await groupChatStore.getGroupChatList()
     socket.on('connect', async () => {
@@ -75,6 +86,7 @@ onUnmounted(() => {
     display: flex;
 
     .chatLeft {
+        width: 300px;
         min-width: 300px;
 
         .title {
@@ -112,10 +124,27 @@ onUnmounted(() => {
             .chat-list {
                 box-sizing: border-box;
                 padding-left: 10px;
-                height: 65vh;
+                height: 60vh;
                 margin-top: 20px;
                 overflow: hidden;
                 overflow-y: scroll;
+
+                .blank-part {
+                    display: flex;
+                    width: 100%;
+                    flex-direction: column;
+
+                    img {
+                        width: 100%;
+                    }
+
+                    h3 {
+                        text-align: center;
+                        color: #ccc;
+                    }
+                }
+
+
 
                 &::-webkit-scrollbar {
                     // 隐藏滚动条

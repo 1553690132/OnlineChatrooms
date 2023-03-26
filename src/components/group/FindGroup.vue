@@ -10,15 +10,22 @@
                 {{ item.groupMembers.length }}
             </span>
             <button class="add-btn" @click="joinGroup" v-if="!search">加入群</button>
-            <button class="add-btn" v-else>去聊天</button>
+            <button class="add-btn" v-else @click="sendGroupShow">去聊天</button>
         </div>
     </div>
 </template>
 
 <script setup>
+import router from '@/router';
 import $axios from '@/api';
+import { groupChatInfoStore } from '@/store/groupChat';
+import {chatWindowStore} from '@/store/chatWindowStore'
 import { UserFilled } from '@element-plus/icons-vue';
+import { navInfoStore } from '@/store/navStore';
 import { ElMessage } from 'element-plus';
+const groupChatStore = groupChatInfoStore()
+const windowStore = chatWindowStore()
+const navStore = navInfoStore()
 const props = defineProps({ item: Object, search: Boolean })
 const emit = defineEmits(['closeSearchCard'])
 const joinGroup = async () => {
@@ -27,7 +34,15 @@ const joinGroup = async () => {
     emit('closeSearchCard')
     return ElMessage.success('添加成功!')
 }
-
+const sendGroupShow = () => {
+    $axios.post('/groupChat/show', { gid: props.item.gid }).then(async res => {
+        if (res.status !== 200) return ElMessage.error('发生了一些错误')
+        router.push('/home/comment')
+        sessionStorage.setItem('chatWay', false)
+        await windowStore.chooseChat(props.item)
+        navStore.changeMenu(0)
+    })
+}
 </script>
 
 <style lang="less" scoped>
@@ -44,7 +59,7 @@ const joinGroup = async () => {
         background-color: #3f90f6 !important;
     }
 
-    .add-btn  {
+    .add-btn {
         width: 50px !important;
     }
 

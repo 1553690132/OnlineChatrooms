@@ -89,7 +89,7 @@ const windowStore = chatWindowStore()
 const userStore = userInfoStore()
 const loading = loadingStore()
 const groupChatStore = groupChatInfoStore()
-const avatar = ref(null), headImg = ref('')
+const avatar = ref(null)
 const showEmojiList = ref(false), chatMsg = reactive([])
 const cameraShow = ref(false), locationShow = ref(false), inviteShow = ref(false)
 const props = defineProps({ chatWay: Boolean })
@@ -243,7 +243,6 @@ const sendEmoji = (msg) => {
         }
     }
     sendMsg(newMsg)
-    userStore.listSort(windowStore.chatWindowInfo._id)
     scrollBottom()
     chooseEmoji()
 }

@@ -7,7 +7,8 @@
             <div class="friend-left">
                 <div class="search-part">
                     <el-input v-model.lazy="searchContext" :prefix-icon="Search" placeholder="搜索"
-                        :class="{ actived: isFocus }" clearable @focus="focus" @change="searchFor" @blur="blur"></el-input>
+                        :class="{ actived: isFocus }" clearable @focus="focus" @change="searchFor" @blur="blur"
+                        @clear="closeCard"></el-input>
                     <el-popconfirm title="请选择您的操作" icon="warning" confirm-button-text="加好友/加群" cancel-button-text="创建群聊"
                         cancel-button-type="success" @confirm="showSearchPart" @cancel="showCreateGroup" width="200">
                         <template #reference>

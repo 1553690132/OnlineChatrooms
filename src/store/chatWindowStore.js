@@ -8,6 +8,7 @@ export const chatWindowStore = defineStore('chatWindowStore', {
             preCurrent: '',
             showChatWindow: false,
             chatWindowInfo: {},
+            isDelete: false
         }
     },
     actions: {
@@ -27,6 +28,6 @@ export const chatWindowStore = defineStore('chatWindowStore', {
             const userStore = userInfoStore()
             const { data: res } = await $axios.post('chat/reading', { sid, rid: userStore._id })
             if (res.status == 200) await userStore.getUserInfo()
-        }
+        },
     }
 })

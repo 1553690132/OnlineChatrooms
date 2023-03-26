@@ -26,6 +26,7 @@ import { clickMenu } from '@/tools/menu'
 import { userInfoStore } from '@/store/userStore';
 import Personal from '@/components/personal/Personal.vue';
 import $axios from '@/api';
+import router from '@/router';
 const userStore = userInfoStore()
 const windowStore = chatWindowStore()
 const props = defineProps({
@@ -36,9 +37,19 @@ const friendCard = ref(null), menu = ref(null)
 onMounted(() => {
     clickMenu(friendCard.value, menu.value)
 })
-const deleteChat = () => { }
-const hideChat = () => {
-    $axios.post('/chat/hide', { uid: userStore._id, fid: props.chatFriendInfo._id })
+const deleteChat = async () => {
+    const { data: res } = await $axios.delete('/chat/delete', { params: { sid: userStore._id, rid: props.chatFriendInfo._id } })
+    if (res.status === 200) {
+        windowStore.clearStatus()
+        router.go(0)
+    }
+}
+const hideChat = async () => {
+    const { data: res } = await $axios.put('/chat/hide', { uid: userStore._id, fid: props.chatFriendInfo._id })
+    if (res.status === 200) {
+        windowStore.clearStatus()
+        router.go(0)
+    }
 }
 </script>
 <style lang="less" scoped>
