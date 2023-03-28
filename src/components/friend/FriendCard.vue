@@ -1,22 +1,25 @@
 <template>
-    <div class="friendCard" ref="friendCard" :class="{ activeCard: chatFriendInfo._id == windowStore.preCurrent }">
-        <el-badge :value="chatFriendInfo.unreadNum" :max="99" class="item" v-if="!chatFriendInfo.isread">
-        </el-badge>
-        <div class="info">
-            <Personal :imgUrl="chatFriendInfo.headImg" :online="chatFriendInfo.online" :showOnline="true"></Personal>
-            <div class="info-msg">
-                <div class="name">{{ chatFriendInfo.nickname }}</div>
-                <div class="detail">{{ chatFriendInfo.lastMsg }}</div>
+    <transition name="el-zoom-in-center">
+        <div class="friendCard" ref="friendCard" :class="{ activeCard: chatFriendInfo._id == windowStore.preCurrent }"
+            v-show="isShow">
+            <el-badge :value="chatFriendInfo.unreadNum" :max="99" class="item" v-if="!chatFriendInfo.isread">
+            </el-badge>
+            <div class="info">
+                <Personal :imgUrl="chatFriendInfo.headImg" :online="chatFriendInfo.online" :showOnline="true"></Personal>
+                <div class="info-msg">
+                    <div class="name">{{ chatFriendInfo.nickname }}</div>
+                    <div class="detail">{{ chatFriendInfo.lastMsg }}</div>
+                </div>
+                <div class="info-time">
+                    <span class="time">{{ times }}</span>
+                </div>
             </div>
-            <div class="info-time">
-                <span class="time">{{ times }}</span>
-            </div>
+            <ul class="menu" ref="menu">
+                <li @click.stop="deleteChat">删除聊天</li>
+                <li @click.stop="hideChat">不显示该聊天</li>
+            </ul>
         </div>
-        <ul class="menu" ref="menu">
-            <li @click="deleteChat">删除聊天</li>
-            <li @click="hideChat">不显示该聊天</li>
-        </ul>
-    </div>
+    </transition>
 </template>
 <script setup>
 import moment from 'moment'
@@ -26,14 +29,13 @@ import { clickMenu } from '@/tools/menu'
 import { userInfoStore } from '@/store/userStore';
 import Personal from '@/components/personal/Personal.vue';
 import $axios from '@/api';
-import router from '@/router';
 const userStore = userInfoStore()
 const windowStore = chatWindowStore()
 const props = defineProps({
     chatFriendInfo: Object,
 })
 const times = computed(() => { return moment(props.chatFriendInfo.lastTime).fromNow() })
-const friendCard = ref(null), menu = ref(null)
+const friendCard = ref(null), menu = ref(null), isShow = ref(true)
 onMounted(() => {
     clickMenu(friendCard.value, menu.value)
 })
@@ -41,14 +43,14 @@ const deleteChat = async () => {
     const { data: res } = await $axios.delete('/chat/delete', { params: { sid: userStore._id, rid: props.chatFriendInfo._id } })
     if (res.status === 200) {
         windowStore.clearStatus()
-        router.go(0)
+        isShow.value = false
     }
 }
 const hideChat = async () => {
     const { data: res } = await $axios.put('/chat/hide', { uid: userStore._id, fid: props.chatFriendInfo._id })
     if (res.status === 200) {
         windowStore.clearStatus()
-        router.go(0)
+        isShow.value = false
     }
 }
 </script>
@@ -142,20 +144,20 @@ const hideChat = async () => {
         background-color: #fff;
         z-index: 10;
         overflow: visible !important;
-    }
 
-    .menu li {
-        list-style: none;
-        font-size: 14px;
-        font-family: system-ui;
-        cursor: pointer;
-        height: 20px;
-        line-height: 20px;
-        padding: 8px;
-    }
+        li {
+            list-style: none;
+            font-size: 14px;
+            font-family: system-ui;
+            cursor: pointer;
+            height: 20px;
+            line-height: 20px;
+            padding: 8px;
 
-    .menu li:hover {
-        background-color: #dfdfdf;
+            &:hover {
+                background-color: #dfdfdf;
+            }
+        }
     }
 }
 

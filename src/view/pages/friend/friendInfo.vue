@@ -49,7 +49,8 @@
                     </li>
                 </ul>
                 <div class="configInfo">
-                    <button @click="sendMessageToFriend">发送消息</button>
+                    <button class="sendMessage" @click="sendMessageToFriend">发送消息</button>
+                    <div class="deleteFriend" @click="deleteFriend">删除好友</div>
                 </div>
             </div>
         </el-card>
@@ -61,7 +62,7 @@ import $axios from '@/api';
 import router from '@/router';
 import { friendInfoStore } from '@/store/friendInfo';
 import { friendListInfoStore } from '@/store/friendList'
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { navInfoStore } from '@/store/navStore';
 import { chatWindowStore } from '@/store/chatWindowStore'
 import { userInfoStore } from '@/store/userStore';
@@ -89,6 +90,27 @@ const sendMessageToFriend = () => {
     })
 }
 
+const deleteFriend = () => {
+    ElMessageBox.confirm(
+        `您确定要删除好友 <strong>${_friendInfoStore.friendInfo.nickname}</strong> 吗?`,
+        'Warning',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+            dangerouslyUseHTMLString: true
+        }).then(async () => {
+            const { data: res } = await $axios.delete('/friend/delete', { params: { uid: userStore._id, fid: _friendInfoStore.friendInfo._id } })
+            if (res.status !== 200) return ElMessage.err('删除失败!')
+            await friendGroupStore.getGroupList()
+            _friendInfoStore.clearStatus()
+        }).catch(() => {
+            ElMessage({
+                type: 'info',
+                message: '取消删除',
+            })
+        })
+}
 </script>
 
 <style lang="less" scoped>
@@ -201,17 +223,34 @@ const sendMessageToFriend = () => {
                 width: 100%;
                 justify-content: center;
 
-                button {
+                .sendMessage {
                     color: #fff;
-                    width: 80%;
+                    width: 45%;
                     height: 40px;
                     border: none;
                     font-size: 14px;
-                    background-color: #1d90f5;
+                    background-color: #1e6fff;
                     cursor: pointer;
+                    margin-right: 20px;
 
                     &:hover {
-                        background-color: #3aa1fb;
+                        background-color: #2f7cff;
+                    }
+                }
+
+                .deleteFriend {
+                    color: #000;
+                    width: 45%;
+                    height: 40px;
+                    border: none;
+                    font-size: 14px;
+                    background-color: #fff;
+                    cursor: pointer;
+                    text-align: center;
+                    line-height: 40px;
+
+                    &:hover {
+                        background-color: #eeeeee;
                     }
                 }
             }

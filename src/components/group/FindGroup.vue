@@ -2,7 +2,9 @@
     <div class="findGroup" :class="{ search: search }">
         <div class="avatar">群</div>
         <div class="right-part">
-            <span class="group-name">{{ item.groupName }}</span>
+            <span class="group-name">
+                {{ item.groupName }}
+            </span>
             <span class="group-nums">
                 <el-icon>
                     <UserFilled />
@@ -19,7 +21,7 @@
 import router from '@/router';
 import $axios from '@/api';
 import { groupChatInfoStore } from '@/store/groupChat';
-import {chatWindowStore} from '@/store/chatWindowStore'
+import { chatWindowStore } from '@/store/chatWindowStore'
 import { UserFilled } from '@element-plus/icons-vue';
 import { navInfoStore } from '@/store/navStore';
 import { ElMessage } from 'element-plus';
@@ -32,6 +34,7 @@ const joinGroup = async () => {
     const { data: res } = await $axios.post('groupChat/join', { gid: props.item.gid })
     if (res.status !== 200) return ElMessage.error(res.message)
     emit('closeSearchCard')
+    await groupChatStore.getGroupChatList()
     return ElMessage.success('添加成功!')
 }
 const sendGroupShow = () => {
@@ -69,7 +72,7 @@ const sendGroupShow = () => {
 }
 
 .findGroup {
-    width: 30%;
+    width: 40%;
     height: auto;
     display: flex;
     box-sizing: border-box;
@@ -100,7 +103,7 @@ const sendGroupShow = () => {
         align-items: flex-start;
 
         .group-name {
-            font-size: 20px;
+            font-size: 18px;
         }
 
         .group-nums {

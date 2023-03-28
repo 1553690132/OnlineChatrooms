@@ -21,16 +21,19 @@ import { computed } from 'vue';
 import { friendInfoStore } from '@/store/friendInfo';
 import { navInfoStore } from '@/store/navStore';
 import { chatWindowStore } from '@/store/chatWindowStore';
+import { friendListInfoStore } from '@/store/friendList';
 const _friendInfoStore = friendInfoStore()
+const friendListStore = friendListInfoStore()
 const navStore = navInfoStore()
 const chatWindowInfoStore = chatWindowStore()
 const props = defineProps({ item: Object, search: Boolean })
 const emit = defineEmits(['closeSearchCard'])
-const userStore = userInfoStore()
+const userStore = userInfoStore() 
 const sex = computed(() => { return props.item.sex === '女' ? true : false })
 const addFriend = async () => {
     const { data: res } = await $axios.post('friend/increase', { _id: userStore._id, friendName: props.item.username })
     if (res.status !== 200) return ElMessage.error(res.message)
+    await friendListStore.getGroupList()
     emit('closeSearchCard')
     return ElMessage.success('添加成功!')
 }

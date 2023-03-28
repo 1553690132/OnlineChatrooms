@@ -2,7 +2,7 @@
     <div class="chatHome">
         <div class="chatLeft">
             <div class="title">
-                <h1>摸鱼聊天室</h1>
+                <h1>HM-7 聊天室</h1>
             </div>
             <div class="chatting">
                 <div class="chat-t">
@@ -37,6 +37,10 @@
             </div>
             <div class="showIcon" v-else>
                 <img src="@/assets/img/index.png">
+                <div class="text-part">
+                    <h3>打开世界的另一扇窗</h3>
+                    <span>主动一点，世界会更大。</span>
+                </div>
             </div>
         </div>
     </div>
@@ -139,6 +143,7 @@ onUnmounted(() => {
                     }
 
                     h3 {
+                        margin-top: 20px;
                         text-align: center;
                         color: #ccc;
                     }
@@ -164,15 +169,28 @@ onUnmounted(() => {
             position: relative;
             width: 100%;
             height: 100%;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            flex-direction: column;
+            justify-content: space-evenly;
 
             img {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
                 width: 340px;
                 height: 340px;
                 color: rgb(117, 120, 137);
+
+            }
+
+            h3 {
+                color: #fff;
+
+            }
+
+            span {
+                color: #ddd;
+                font-size: 14px;
+                font-family: 'Courier New', Courier, monospace;
             }
 
         }

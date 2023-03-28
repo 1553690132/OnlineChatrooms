@@ -1,6 +1,7 @@
 <template>
     <div class="groupList">
-        <div class="group-item" v-for="(groupChatInfo, index) in groupChatStore.groupChatList" :key="groupChatInfo._id"
+        <div class="group-item" v-if="groupChatStore.groupChatList.length"
+            v-for="(groupChatInfo, index) in groupChatStore.groupChatList" :key="groupChatInfo._id"
             @click="chooseGroupInfo(groupChatInfo.gid, index)"
             :class="{ isChoose: groupChatStore.groupChatInfos.groupName === groupChatInfo.groupName }">
             <div class="avatar" ref="avatar">
@@ -8,6 +9,11 @@
             </div>
             <div class="group-name">{{ groupChatInfo.groupName }}</div>
         </div>
+        <div class="blank-part" v-else>
+            <img src="@/assets/img/blankGroup.png" alt="blank">
+            <h3>暂无群聊</h3>
+        </div>
+
     </div>
 </template>
 
@@ -21,14 +27,28 @@ const chooseGroupInfo = async (gid, index) => {
     await groupChatStore.getChooseGroupInfo(gid)
 }
 onMounted(() => {
-    avatar.value.forEach(element => {
-        generateRandomColors(element)
-    })
+    if (avatar.value) {
+        avatar.value.forEach(element => {
+            generateRandomColors(element)
+        })
+    }
 })
 </script>
 
 <style lang="less" scoped>
 .groupList {
+
+    .blank-part {
+        width: 100%;
+        text-align: center;
+        color: #ddd;
+        img {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+
 
     .isChoose {
         background-color: #1e2128 !important;

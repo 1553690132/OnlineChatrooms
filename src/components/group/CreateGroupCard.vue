@@ -79,10 +79,11 @@ const addGroupMember = (item, checked) => {
 }
 const submitGroup = async () => {
     if (props.invite) {
-        const { data: res } = await $axios.post('groupChat/invite', { gid: windowStore.chatWindowInfo.gid, members: JSON.stringify(member_msg.value) })
+        const { data: res } = await $axios.post('groupChat/invite', { gid: windowStore.chatWindowInfo.gid, members: JSON.stringify(member_msg.value), groupName: windowStore.chatWindowInfo.groupName })
         dialogVisible.value = false
         if (res.status !== 200) return ElMessage.error('邀请失败!')
         router.go(0)
+        sessionStorage.setItem('chatWay', false)
         ElMessage.success('邀请成功!')
     }
     else {

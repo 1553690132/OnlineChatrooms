@@ -1,24 +1,25 @@
 <template>
-    <div class="groupCard" ref="groupCard" :class="{ activeCard: groupChatInfo._id == windowStore.preCurrent }"
-        @click="setColor">
-        <div class="info">
-            <div class="info-avatar">
-                <div class="avatar" ref="avatar">
-                    <span>群</span>
+    <transition name="el-zoom-in-center">
+        <div class="groupCard" ref="groupCard" :class="{ activeCard: groupChatInfo._id == windowStore.preCurrent }"
+            @click="setColor" v-show="isShow">
+            <div class="info">
+                <div class="info-avatar">
+                    <div class="avatar" ref="avatar">
+                        <span>群</span>
+                    </div>
+                </div>
+                <div class="info-msg">
+                    <div class="name">{{ groupChatInfo.groupName }}</div>
                 </div>
             </div>
-            <div class="info-msg">
-                <div class="name">{{ groupChatInfo.groupName }}</div>
-            </div>
+            <ul class="menu" ref="menu">
+                <li @click.stop="deleteChat">删除聊天</li>
+                <li @click.stop="hideChat">不显示该聊天</li>
+            </ul>
         </div>
-        <ul class="menu" ref="menu">
-            <li @click="deleteChat">删除聊天</li>
-            <li @click="hideChat">不显示该聊天</li>
-        </ul>
-    </div>
+    </transition>
 </template>
 <script setup>
-import router from '@/router';
 import { ref, onMounted } from 'vue';
 import { generateRandomColors } from '@/tools/index'
 import { chatWindowStore } from '@/store/chatWindowStore';
@@ -27,7 +28,7 @@ import $axios from '@/api';
 import { ElMessage } from 'element-plus';
 const windowStore = chatWindowStore()
 const props = defineProps({ groupChatInfo: Object })
-const avatar = ref(null), groupCard = ref(null), menu = ref(null)
+const avatar = ref(null), groupCard = ref(null), menu = ref(null), isShow = ref(true)
 onMounted(() => {
     generateRandomColors(avatar.value)
     clickMenu(groupCard.value, menu.value)
@@ -39,8 +40,7 @@ const hideChat = async () => {
     const { data: res } = await $axios.put('/groupChat/hide', { gid: props.groupChatInfo.gid })
     if (res.status === 200) {
         windowStore.clearStatus()
-        sessionStorage.setItem('chatWay', false)
-        router.go(0)
+        isShow.value = false
     }
 }
 const setColor = () => {
