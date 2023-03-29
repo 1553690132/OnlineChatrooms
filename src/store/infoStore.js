@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import $axios from "@/api";
+import api from "@/api/_index";
 
 export const infoStore = defineStore('infoStore', {
     state: () => {
@@ -11,7 +12,7 @@ export const infoStore = defineStore('infoStore', {
     },
     actions: {
         async getSpecificInfo(username) {
-            const { data: res } = await $axios.get('/info/gainInfo', { params: { username } })
+            const res = await api.specificInfo.gainInfo({ username })
             this.userInfo = {
                 ...res.message, _age: +new Date().toLocaleDateString().substring(0, 4) -
                     +res.message.age.substring(0, 4)

@@ -1,6 +1,7 @@
 import { defineStore } from "pinia"
 import $axios from "@/api"
 import { userInfoStore } from "./userStore"
+import api from '@/api/_index'
 
 export const chatWindowStore = defineStore('chatWindowStore', {
     state: () => {
@@ -26,7 +27,7 @@ export const chatWindowStore = defineStore('chatWindowStore', {
 
         async alreadyRead(sid) {
             const userStore = userInfoStore()
-            const { data: res } = await $axios.post('chat/reading', { sid, rid: userStore._id })
+            const res = await api.chatMsg.toggleRead({ sid, rid: userStore._id })
             if (res.status == 200) await userStore.getUserInfo()
         },
     }

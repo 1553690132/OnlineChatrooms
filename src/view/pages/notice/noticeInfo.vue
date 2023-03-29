@@ -21,14 +21,16 @@
 import moment from 'moment';
 import { userInfoStore } from '@/store/userStore';
 import { Delete } from '@element-plus/icons-vue';
+import { getCurrentInstance } from 'vue';
 import $axios from '@/api';
 import { ElMessage } from 'element-plus';
 moment.locale('zh-CN')
 const userStore = userInfoStore()
+const { proxy } = getCurrentInstance()
 const props = defineProps({ notifications: Array })
 const emit = defineEmits(['getNotice'])
 const deleteNotice = async (item) => {
-    const { data: res } = await $axios.delete('/notice/delete', { params: { uid: userStore._id, nid: item.nid } })
+    const res = await proxy.$api.notice.deleteNotice({ uid: userStore._id, nid: item.nid })
     if (res.status !== 200) return ElMessage.error('删除失败!')
     emit('getNotice')
 }

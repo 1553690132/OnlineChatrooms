@@ -10,7 +10,8 @@
                 </div>
                 <el-scrollbar>
                     <div class="notification-list">
-                        <noticeInfo v-if="notifications.length" :notifications="notifications" @getNotice="getNotice"></noticeInfo>
+                        <noticeInfo v-if="notifications.length" :notifications="notifications" @getNotice="getNotice">
+                        </noticeInfo>
                         <img src="@/assets/img/blankNotice.png" alt="blank" v-else>
                     </div>
                 </el-scrollbar>
@@ -20,15 +21,15 @@
 </template>
 
 <script setup>
-import $axios from '@/api';
 import noticeInfo from './noticeInfo.vue';
 import { userInfoStore } from '@/store/userStore';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, getCurrentInstance } from 'vue';
 import { ElMessage } from 'element-plus';
+const { proxy } = getCurrentInstance()
 const userStore = userInfoStore()
 const notifications = ref([])
 const getNotice = async () => {
-    const { data: res } = await $axios.get('/notice/gain', { params: { uid: userStore._id } })
+    const res = await proxy.$api.notice.getNoticeList({ uid: userStore._id })
     if (res.status !== 200) return ElMessage.error('获取失败')
     notifications.value = res.message
 }

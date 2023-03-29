@@ -1,7 +1,7 @@
 import { defineStore } from "pinia"
-import $axios from "@/api"
 import { ElMessage } from "element-plus"
 import { userInfoStore } from "./userStore"
+import api from "@/api/_index"
 
 export const friendListInfoStore = defineStore('friendListInfoStore', {
     state: () => {
@@ -14,7 +14,7 @@ export const friendListInfoStore = defineStore('friendListInfoStore', {
             const userStore = userInfoStore()
             await userStore.getUserInfo()
             try {
-                const { data: res } = await $axios.get('friendGroup/getFriendGroup', { params: { uid: userStore._id } })
+                const res = await api.friendGroup.getFriendGroup({ uid: userStore._id })
                 if (res.status !== 200) return ElMessage({ type: 'error', message: '获取失败!' })
                 this.groupList = []
                 this.groupList.push(...res.message)

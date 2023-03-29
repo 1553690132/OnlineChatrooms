@@ -27,10 +27,10 @@
 import CronyCard from '@/components/friend/CronyCard.vue';
 import { HelpFilled } from '@element-plus/icons-vue';
 import { friendListInfoStore } from '@/store/friendList';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, getCurrentInstance } from 'vue';
 import { clickMenu } from '@/tools/menu';
-import $axios from '@/api';
 import { ElMessage } from 'element-plus';
+const { proxy } = getCurrentInstance()
 const friendListStore = friendListInfoStore()
 const emit = defineEmits(['chooseFriendInfo'])
 const menu = ref(null), friendList = ref(null), dialogVisible = ref(false), divideGroupName = ref('')
@@ -42,7 +42,7 @@ const createGroup = () => {
 }
 const insertdivideGroup = async () => {
     if (!divideGroupName.value) return ElMessage.info('请输入分组名!')
-    const { data: res } = await $axios.post('friendGroup/insertFriendGroup', { divideGroupName: divideGroupName.value })
+    const res = await proxy.$api.friendGroup.insertFriendGroup({ divideGroupName: divideGroupName.value })
     if (res.status !== 200) return ElMessage.error(res.message)
     await friendListStore.getGroupList()
     dialogVisible.value = false

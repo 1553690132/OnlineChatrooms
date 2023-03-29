@@ -1,6 +1,6 @@
 import { defineStore } from "pinia"
-import $axios from "@/api"
 import { ElMessage } from "element-plus"
+import api from "@/api/_index"
 
 export const groupChatInfoStore = defineStore('groupChatInfoStore', {
     state: () => {
@@ -22,7 +22,7 @@ export const groupChatInfoStore = defineStore('groupChatInfoStore', {
     },
     actions: {
         async getGroupChatList() {
-            const { data: res } = await $axios.get('/groupChat/gain')
+            const res = await api.groupChat.gainGroupChat()
             if (res.status !== 200) return ElMessage.error('获取失败!')
             this.groupChatList = []
             this.groupChatList.push(...res.message)
@@ -33,7 +33,7 @@ export const groupChatInfoStore = defineStore('groupChatInfoStore', {
             }
         },
         async getChooseGroupInfo(gid) {
-            const { data: res } = await $axios.get('/groupChat/find', { params: { gid } })
+            const res = await api.groupChat.findGroupById({ gid })
             if (res.status !== 200) return ElMessage.error('获取失败!')
             this.groupChatInfos = { ...res.message.result }
             this.showGroupInfo = true

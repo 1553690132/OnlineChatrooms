@@ -58,7 +58,6 @@
 </template>
 
 <script setup>
-import $axios from '@/api';
 import router from '@/router';
 import { friendInfoStore } from '@/store/friendInfo';
 import { friendListInfoStore } from '@/store/friendList'
@@ -66,28 +65,26 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { navInfoStore } from '@/store/navStore';
 import { chatWindowStore } from '@/store/chatWindowStore'
 import { userInfoStore } from '@/store/userStore';
+import { getCurrentInstance } from 'vue';
+const { proxy } = getCurrentInstance()
 const userStore = userInfoStore()
 const navStore = navInfoStore()
 const _friendInfoStore = friendInfoStore()
 const friendGroupStore = friendListInfoStore()
 const chatWindowInfoStore = chatWindowStore()
-const submitDivide = () => {
-    $axios.post('/friendGroup/changeFriendGroup', { uid: userStore._id, groupName: _friendInfoStore.groupName, friendName: _friendInfoStore.friendInfo.username }).then(async res => {
-        _friendInfoStore.clearStatus()
-        await friendGroupStore.getGroupList()
-        return ElMessage.success('更新分组成功!')
-    }).catch(err => {
-        return ElMessage.error(err)
-    })
+const submitDivide = async () => {
+    const res = await proxy.$api.friendGroup.changeFriendGroup({ uid: userStore._id, groupName: _friendInfoStore.groupName, friendName: _friendInfoStore.friendInfo.username })
+    _friendInfoStore.clearStatus()
+    await friendGroupStore.getGroupList()
+    return ElMessage.success('更新分组成功!')
 }
 
-const sendMessageToFriend = () => {
-    $axios.post('/friendGroup/sendMsgTo', { uid: userStore._id, friendName: _friendInfoStore.friendInfo.username }).then(async res => {
-        if (res.status !== 200) return ElMessage.error('发生了一些错误!')
-        router.push('/home/comment')
-        await chatWindowInfoStore.chooseChat(_friendInfoStore.friendInfo)
-        navStore.changeMenu(0)
-    })
+const sendMessageToFriend = async () => {
+    const res = await proxy.$api.friendGroup.sendMessageTo({ uid: userStore._id, friendName: _friendInfoStore.friendInfo.username })
+    if (res.status !== 200) return ElMessage.error('发生了一些错误!')
+    router.push('/home/comment')
+    await chatWindowInfoStore.chooseChat(_friendInfoStore.friendInfo)
+    navStore.changeMenu(0)
 }
 
 const deleteFriend = () => {
@@ -100,7 +97,7 @@ const deleteFriend = () => {
             type: 'warning',
             dangerouslyUseHTMLString: true
         }).then(async () => {
-            const { data: res } = await $axios.delete('/friend/delete', { params: { uid: userStore._id, fid: _friendInfoStore.friendInfo._id } })
+            const res = await proxy.$api.friend.deleteFriend({ uid: userStore._id, fid: _friendInfoStore.friendInfo._id })
             if (res.status !== 200) return ElMessage.err('删除失败!')
             await friendGroupStore.getGroupList()
             _friendInfoStore.clearStatus()

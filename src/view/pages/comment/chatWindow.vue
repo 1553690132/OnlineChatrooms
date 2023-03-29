@@ -74,7 +74,7 @@ import CameraTake from '@/components/camera/CameraTake.vue'
 import Location from '@/components/location/Location.vue';
 import CreateGroupCard from '@/components/group/CreateGroupCard.vue';
 import Emoji from '@/components/chats/Emoji.vue';
-import { ref, watch, onMounted, reactive, nextTick, computed } from 'vue';
+import { ref, watch, onMounted, reactive, nextTick, computed, getCurrentInstance } from 'vue';
 import { animationScroll } from '@/tools/index'
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { chatWindowStore } from '@/store/chatWindowStore';
@@ -82,7 +82,6 @@ import { userInfoStore } from '@/store/userStore';
 import { loadingStore } from '@/store/lodingStore';
 import { groupChatInfoStore } from '@/store/groupChat';
 import qs from 'qs';
-import $axios from '@/api';
 import socket from '@/tools/socket';
 import axios from 'axios';
 const windowStore = chatWindowStore()
@@ -91,6 +90,7 @@ const loading = loadingStore()
 const groupChatStore = groupChatInfoStore()
 const avatar = ref(null)
 const showEmojiList = ref(false), chatMsg = reactive([])
+const { proxy } = getCurrentInstance()
 const cameraShow = ref(false), locationShow = ref(false), inviteShow = ref(false)
 const props = defineProps({ chatWay: Boolean })
 const _name = computed(() => { return props.chatWay ? windowStore.chatWindowInfo.nickname : windowStore.chatWindowInfo.groupName })
@@ -100,7 +100,7 @@ const chooseEmoji = () => showEmojiList.value = !showEmojiList.value
 // 切换时更新窗口个人聊天数据
 const updateMsg = async (info) => {
     loading.showLoading
-    let { data: res } = await $axios.get('chat/gain', { params: { sid: userStore._id, rid: info._id } })
+    const res = await proxy.$api.chatMsg.gainMsg({ sid: userStore._id, rid: info._id })
     loading.hideLoading
     if (res.status !== 200) return ElMessage({ type: 'error', message: res.message })
     chatMsg.length = 0
@@ -209,7 +209,7 @@ const sendMsg = async (msgs, type = '') => {
             msg: chats,
         })
 
-        const { data: res } = await $axios.post('chat/send', { sid: userStore._id, rid: windowStore.chatWindowInfo._id, chats })
+        const res = await proxy.$api.chatMsg.sendMessage({ sid: userStore._id, rid: windowStore.chatWindowInfo._id, chats })
         if (res.status !== 200) return ElMessage({ type: 'error', message: res.message })
         // 发送后重新获取
         updateMsg(windowStore.chatWindowInfo)
@@ -223,7 +223,7 @@ const sendMsg = async (msgs, type = '') => {
             rid: windowStore.chatWindowInfo._id,
             msg: chats
         })
-        const { data: res } = await $axios.post('groupChat/send', { gid: windowStore.chatWindowInfo._id, message: chats })
+        const res = await proxy.$api.groupChat.sendGroupMsg({ gid: windowStore.chatWindowInfo._id, message: chats })
         if (res.status !== 200) return ElMessage.error('fail!')
         updateGroupMsg(windowStore.chatWindowInfo.gid)
         scrollBottom()

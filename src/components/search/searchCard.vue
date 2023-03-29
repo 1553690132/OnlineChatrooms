@@ -30,14 +30,14 @@
 </template>
 
 <script setup>
-import $axios from '@/api';
 import FindFriend from '../friend/FindFriend.vue';
 import FindGroup from '../group/FindGroup.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, getCurrentInstance } from 'vue';
 import { Search } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 const emit = defineEmits(['showSearchPart'])
 const dialogVisible = ref(true), showResult = ref(false), searchCondition = ref(''), searchResult = ref([]), partChange = ref(true)
+const { proxy } = getCurrentInstance()
 const showInfo = computed(() => { return searchResult.value.length === 0 ? true : false })
 const closeSearchCard = () => {
     dialogVisible.value = false
@@ -45,8 +45,8 @@ const closeSearchCard = () => {
 }
 const inquireAbout = async () => {
     if (!searchCondition.value) return ElMessage.info('请先填写查询条件!')
-    const { data: res } = await $axios.get('/search/people', { params: { searchCondition: searchCondition.value } })
-    if (res.status !== 200) return ElMessage.error('查询失败!')
+    const res = await proxy.$api.search.searchPeople({ searchCondition: searchCondition.value })
+    proxy.$prompt('查询', res.status)
     showResult.value = true
     searchResult.value = []
     if (res.message instanceof Array) searchResult.value.push(...res.message)
@@ -54,8 +54,7 @@ const inquireAbout = async () => {
 }
 const findGroups = async () => {
     if (!searchCondition.value) return ElMessage.info('请先填写查询条件!')
-    const { data: res } = await $axios.get('/search/group', { params: { searchCondition: searchCondition.value } })
-    if (res.status !== 200) return ElMessage.error('查询失败!')
+    const res = await proxy.$api.search.searchGroup({ searchCondition: searchCondition.value })
     showResult.value = true
     searchResult.value = []
     console.log(res.message);

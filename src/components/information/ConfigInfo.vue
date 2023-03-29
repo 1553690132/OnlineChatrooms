@@ -53,9 +53,10 @@
 <script setup>
 import $axios from '@/api';
 import { ElMessage } from 'element-plus';
-import { onMounted, reactive } from 'vue';
+import { onMounted, reactive, getCurrentInstance } from 'vue';
 import { userInfoStore } from '@/store/userStore';
 import { infoStore } from '@/store/infoStore';
+const { proxy } = getCurrentInstance()
 const emit = defineEmits(['showConfigInfoCard', 'showPersonalConfig'])
 const jobs = reactive([])
 const userStore = userInfoStore()
@@ -66,11 +67,11 @@ const InfoForm = reactive({
     ..._infoStore.userInfo,
 })
 const getJobs = async () => {
-    const { data: res } = await $axios.get('/occupation/job')
+    const res = await proxy.$api.occupation.getOccupation()
     jobs.push(...res.message)
 }
 const saveInfo = async () => {
-    const { data: res } = await $axios.post('/info/configInfo', { username: userStore.username, ...InfoForm })
+    const res = await proxy.$api.specificInfo.configInfo({ username: userStore.username, ...InfoForm })
     if (res.status !== 200) return ElMessage({ type: 'error', message: '更新失败!' })
     ElMessage({ type: 'success', message: '更新成功!' })
     emit('showPersonalConfig')

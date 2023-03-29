@@ -14,10 +14,9 @@
 
 <script setup>
 import router from '@/router';
-import $axios from '@/api';
 import { userInfoStore } from '@/store/userStore';
 import { ElMessage } from 'element-plus';
-import { computed } from 'vue';
+import { computed, getCurrentInstance } from 'vue';
 import { friendInfoStore } from '@/store/friendInfo';
 import { navInfoStore } from '@/store/navStore';
 import { chatWindowStore } from '@/store/chatWindowStore';
@@ -28,23 +27,23 @@ const navStore = navInfoStore()
 const chatWindowInfoStore = chatWindowStore()
 const props = defineProps({ item: Object, search: Boolean })
 const emit = defineEmits(['closeSearchCard'])
-const userStore = userInfoStore() 
+const userStore = userInfoStore()
+const { proxy } = getCurrentInstance()
 const sex = computed(() => { return props.item.sex === '女' ? true : false })
 const addFriend = async () => {
-    const { data: res } = await $axios.post('friend/increase', { _id: userStore._id, friendName: props.item.username })
+    const res = await proxy.$api.friend.increaseFriend({ _id: userStore._id, friendName: props.item.username })
     if (res.status !== 200) return ElMessage.error(res.message)
     await friendListStore.getGroupList()
     emit('closeSearchCard')
     return ElMessage.success('添加成功!')
 }
-const sendMessageToFriend = () => {
-    $axios.post('/friendGroup/sendMsgTo', { uid: userStore._id, friendName: _friendInfoStore.friendInfo.username }).then(async res => {
-        if (res.status !== 200) return ElMessage.error('发生了一些错误!')
-        router.push('/home/comment')
-        await _friendInfoStore.chooseFriendInfo(props.item)
-        await chatWindowInfoStore.chooseChat(_friendInfoStore.friendInfo)
-        navStore.changeMenu(0)
-    })
+const sendMessageToFriend = async () => {
+    const res = await proxy.$api.friendGroup.sendMessageTo({ uid: userStore._id, friendName: _friendInfoStore.friendInfo.username })
+    if (res.status !== 200) return ElMessage.error('发生了一些错误!')
+    router.push('/home/comment')
+    await _friendInfoStore.chooseFriendInfo(props.item)
+    await chatWindowInfoStore.chooseChat(_friendInfoStore.friendInfo)
+    navStore.changeMenu(0)
 }
 </script>
 

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia"
-import $axios from "@/api"
 import { ElMessage } from "element-plus"
+import api from '@/api/_index'
 
 export const userInfoStore = defineStore('userInfoStore', {
     state: () => {
@@ -16,8 +16,9 @@ export const userInfoStore = defineStore('userInfoStore', {
     },
     actions: {
         async getUserInfo() {
+
             try {
-                const { data: res } = await $axios.get('/owner/info')
+                const res = await api.userInfo.getUserInfos()
                 if (res.status !== 200) return ElMessage({ type: 'error', message: '获取失败!' })
                 this._id = res.data.user._id
                 this.username = res.data.user.username
@@ -32,6 +33,7 @@ export const userInfoStore = defineStore('userInfoStore', {
                 this.online = true
                 return this._id
             } catch (error) {
+                console.log(error);
                 return ElMessage({ type: 'error', error })
             }
         },

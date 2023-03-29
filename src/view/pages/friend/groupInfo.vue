@@ -37,14 +37,14 @@
 </template>
 
 <script setup>
-import $axios from '@/api';
 import router from '@/router';
 import { navInfoStore } from '@/store/navStore';
 import { groupChatInfoStore } from '@/store/groupChat';
 import { chatWindowStore } from '@/store/chatWindowStore';
 import { userInfoStore } from '@/store/userStore';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, getCurrentInstance } from 'vue';
+const { proxy } = getCurrentInstance()
 const groupChatStore = groupChatInfoStore()
 const windowStore = chatWindowStore()
 const navStore = navInfoStore()
@@ -53,14 +53,13 @@ const avatar = ref(null), starValue = ref(5)
 const setBackgroundColor = () => {
     avatar.value.style.backgroundColor = sessionStorage.getItem('background-color')
 }
-const sendGroupShow = () => {
-    $axios.post('/groupChat/show', { gid: groupChatStore.groupChatInfos.gid }).then(async res => {
-        if (res.status !== 200) return ElMessage.error('发生了一些错误')
-        router.push('/home/comment')
-        sessionStorage.setItem('chatWay', false)
-        await windowStore.chooseChat(groupChatStore.groupChatInfos)
-        navStore.changeMenu(0)
-    })
+const sendGroupShow = async () => {
+    const res = await proxy.$api.groupChat.showGroupChat({ gid: groupChatStore.groupChatInfos.gid })
+    if (res.status !== 200) return ElMessage.error('发生了一些错误')
+    router.push('/home/comment')
+    sessionStorage.setItem('chatWay', false)
+    await windowStore.chooseChat(groupChatStore.groupChatInfos)
+    navStore.changeMenu(0)
 }
 const deleteGroup = () => {
     ElMessageBox.confirm(
@@ -72,7 +71,7 @@ const deleteGroup = () => {
             type: 'error',
             dangerouslyUseHTMLString: true
         }).then(async () => {
-            const { data: res } = await $axios.delete('/groupChat/delete', { params: { uid: userStore._id, gid: groupChatStore.groupChatInfos.gid, groupName: groupChatStore.groupChatInfos.groupName } })
+            const res = await proxy.$api.groupChat.deleteGroupChat({ uid: userStore._id, gid: groupChatStore.groupChatInfos.gid, groupName: groupChatStore.groupChatInfos.groupName })
             if (res.status !== 200) return ElMessage.error('退出失败!')
             ElMessage.success('退出成功!')
             await groupChatStore.getGroupChatList()

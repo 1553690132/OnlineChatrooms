@@ -47,13 +47,13 @@
 import router from '@/router';
 import GroupCreateFriend from './GroupCreateFriend.vue';
 import { Search } from '@element-plus/icons-vue';
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, getCurrentInstance } from 'vue'
 import { userInfoStore } from '@/store/userStore';
 import { friendListInfoStore } from '@/store/friendList';
 import { chatWindowStore } from '@/store/chatWindowStore';
-import $axios from '@/api';
 import { ElMessage } from 'element-plus';
 const props = defineProps({ invite: Boolean })
+const { proxy } = getCurrentInstance()
 const userStore = userInfoStore()
 const windowStore = chatWindowStore()
 const friendListStore = friendListInfoStore()
@@ -79,7 +79,7 @@ const addGroupMember = (item, checked) => {
 }
 const submitGroup = async () => {
     if (props.invite) {
-        const { data: res } = await $axios.post('groupChat/invite', { gid: windowStore.chatWindowInfo.gid, members: JSON.stringify(member_msg.value), groupName: windowStore.chatWindowInfo.groupName })
+        const res = await proxy.$api.groupChat.inviteMember({ gid: windowStore.chatWindowInfo.gid, members: JSON.stringify(member_msg.value), groupName: windowStore.chatWindowInfo.groupName })
         dialogVisible.value = false
         if (res.status !== 200) return ElMessage.error('邀请失败!')
         router.go(0)
@@ -88,7 +88,7 @@ const submitGroup = async () => {
     }
     else {
         if (groupName.value) {
-            const { data: res } = await $axios.post('groupChat/create', { groupName: groupName.value, members: JSON.stringify(member_msg.value) })
+            const res = await proxy.$api.groupChat.createGroupChat({ groupName: groupName.value, members: JSON.stringify(member_msg.value) })
             dialogVisible.value = false
             if (res.status !== 200) return ElMessage.error('创建失败!')
             router.go(0)

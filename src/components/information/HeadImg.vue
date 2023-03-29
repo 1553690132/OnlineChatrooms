@@ -52,10 +52,6 @@ const uploadAvatar = (data) => {
     reader.readAsDataURL(avatar)
     reader.addEventListener('loadend', function () {
         avatarUrl.value = this.result
-        // formData.append('avatar-url', this.result)
-        // const { data: res } = await axios.post('info/updateAvatar', formData, { 'Content-type': 'multipart/form-data' })
-        // if (res.status !== 200) return ElMessage.error('更新失败!')
-        // return ElMessage.success('更新成功')
     })
 }
 const showAvatarConfig = () => emit('showHeadImgConfig')

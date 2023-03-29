@@ -20,13 +20,14 @@
     </transition>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, getCurrentInstance } from 'vue';
 import { generateRandomColors } from '@/tools/index'
 import { chatWindowStore } from '@/store/chatWindowStore';
 import { clickMenu } from '@/tools/menu';
 import $axios from '@/api';
 import { ElMessage } from 'element-plus';
 const windowStore = chatWindowStore()
+const { proxy } = getCurrentInstance()
 const props = defineProps({ groupChatInfo: Object })
 const avatar = ref(null), groupCard = ref(null), menu = ref(null), isShow = ref(true)
 onMounted(() => {
@@ -37,7 +38,7 @@ const deleteChat = () => {
     return ElMessage.info('该功能开发中')
 }
 const hideChat = async () => {
-    const { data: res } = await $axios.put('/groupChat/hide', { gid: props.groupChatInfo.gid })
+    const res = await proxy.$api.groupChat.hideGroupMessage({ gid: props.groupChatInfo.gid })
     if (res.status === 200) {
         windowStore.clearStatus()
         isShow.value = false
