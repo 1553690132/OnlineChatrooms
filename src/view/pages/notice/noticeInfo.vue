@@ -3,7 +3,7 @@
         <div class="notice-item" v-for="item in notifications" :key="item.nid">
             <div class="avatar">
                 <el-icon>
-                    <BellFilled />
+                    <i-ep-BellFilled></i-ep-BellFilled>
                 </el-icon>
             </div>
             <div class="content">
@@ -11,7 +11,9 @@
             </div>
             <div class="methods">
                 <div class="times">{{ moment(item.times).format('lll') }}</div>
-                <el-button type="danger" :icon="Delete" circle @click="deleteNotice(item)" />
+                <el-button type="danger" circle @click="deleteNotice(item)">
+                    <el-icon><i-ep-delete></i-ep-delete></el-icon>
+                </el-button>
             </div>
         </div>
     </div>
@@ -20,10 +22,7 @@
 <script setup>
 import moment from 'moment';
 import { userInfoStore } from '@/store/userStore';
-import { Delete } from '@element-plus/icons-vue';
 import { getCurrentInstance } from 'vue';
-import $axios from '@/api';
-import { ElMessage } from 'element-plus';
 moment.locale('zh-CN')
 const userStore = userInfoStore()
 const { proxy } = getCurrentInstance()

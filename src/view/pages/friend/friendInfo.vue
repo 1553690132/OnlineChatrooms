@@ -61,7 +61,6 @@
 import router from '@/router';
 import { friendInfoStore } from '@/store/friendInfo';
 import { friendListInfoStore } from '@/store/friendList'
-import { ElMessage, ElMessageBox } from 'element-plus';
 import { navInfoStore } from '@/store/navStore';
 import { chatWindowStore } from '@/store/chatWindowStore'
 import { userInfoStore } from '@/store/userStore';

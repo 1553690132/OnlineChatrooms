@@ -1,5 +1,4 @@
 import { defineStore } from "pinia"
-import $axios from "@/api"
 import { userInfoStore } from "./userStore"
 import api from '@/api/_index'
 

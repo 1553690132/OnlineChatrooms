@@ -4,7 +4,7 @@
             <div class="card-header">
                 <h3>编辑资料</h3>
                 <el-icon>
-                    <CloseBold @click="emit('showConfigInfoCard')" />
+                    <i-ep-CloseBold @click="emit('showConfigInfoCard')"></i-ep-CloseBold>
                 </el-icon>
             </div>
             <div class="card-body">
@@ -51,8 +51,6 @@
     </div>
 </template>
 <script setup>
-import $axios from '@/api';
-import { ElMessage } from 'element-plus';
 import { onMounted, reactive, getCurrentInstance } from 'vue';
 import { userInfoStore } from '@/store/userStore';
 import { infoStore } from '@/store/infoStore';

@@ -4,11 +4,13 @@
             <div class="upload-header">
                 <h4>上传头像</h4>
                 <el-icon>
-                    <CloseBold @click="emit('showHeadImgConfig')" />
+                    <i-ep-CloseBold @click="emit('showHeadImgConfig')"></i-ep-CloseBold>
                 </el-icon>
             </div>
             <el-upload class="upload-demo" drag :before-upload="beforeAvatarUpload" :http-request="uploadAvatar">
-                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                <el-icon class="el-icon--upload">
+                    <i-ep-upload-filled></i-ep-upload-filled>
+                </el-icon>
                 <div class="el-upload__text">
                     点击上传或<em>拖拽图片至此处</em>
                 </div>
@@ -25,7 +27,6 @@
 </template>
 
 <script setup>
-import { ElMessage } from 'element-plus';
 import { ref } from 'vue';
 import AvatarDialog from './AvatarDialog.vue'
 const emit = defineEmits(['showHeadImgConfig'])

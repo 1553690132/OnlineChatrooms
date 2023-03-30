@@ -29,7 +29,6 @@ import routerSvg from '../../localData/routerSvg'
 import { userInfoStore } from '@/store/userStore'
 import { navInfoStore } from '@/store/navStore'
 import Information from '../information/Information.vue';
-import { ElNotification } from 'element-plus'
 const userStore = new userInfoStore()
 const navStore = new navInfoStore()
 const configShow = ref(false), times = ref(0), gap_times = ref(0)

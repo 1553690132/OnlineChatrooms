@@ -5,7 +5,7 @@
                 <div class="info-header">
                     <img class="headImg" :src="userStore.userImg">
                     <el-icon class="headImg-filter">
-                        <CameraFilled @click="showHeadImgConfig" color="white" />
+                        <i-ep-CameraFilled @click="showHeadImgConfig" color="white"></i-ep-CameraFilled>
                     </el-icon>
                     <div class="infos">
                         <div class="username">{{ userStore.nickname }}</div>
@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <el-icon>
-                    <CloseBold @click="emit('showPersonalConfig')" />
+                    <i-ep-CloseBold @click="emit('showPersonalConfig')"></i-ep-CloseBold>
                 </el-icon>
             </div>
             <div class="card-body">

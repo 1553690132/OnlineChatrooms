@@ -42,7 +42,6 @@ import { navInfoStore } from '@/store/navStore';
 import { groupChatInfoStore } from '@/store/groupChat';
 import { chatWindowStore } from '@/store/chatWindowStore';
 import { userInfoStore } from '@/store/userStore';
-import { ElMessage, ElMessageBox } from 'element-plus';
 import { ref, onMounted, watch, getCurrentInstance } from 'vue';
 const { proxy } = getCurrentInstance()
 const groupChatStore = groupChatInfoStore()

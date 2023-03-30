@@ -8,13 +8,15 @@
                 </div>
             </template>
             <div class="search-body" v-if="partChange">
-                <el-input v-model="searchCondition" :prefix-icon="Search" placeholder="请输入对方的账号或昵称"
-                    @keydown.enter="inquireAbout" clearable></el-input>
+                <el-input v-model="searchCondition" placeholder="请输入对方的账号或昵称" @keydown.enter="inquireAbout" clearable>
+                    <el-icon class="el-icon--left"><i-ep-search></i-ep-search></el-icon>
+                </el-input>
                 <el-button type="primary" @click="inquireAbout">查找</el-button>
             </div>
             <div class="search-body" v-else>
-                <el-input v-model="searchCondition" :prefix-icon="Search" placeholder="请输入群名" @keydown.enter="findGroups"
-                    clearable></el-input>
+                <el-input v-model="searchCondition" placeholder="请输入群名" @keydown.enter="findGroups" clearable>
+                    <el-icon class="el-icon--left"><i-ep-search></i-ep-search></el-icon>
+                </el-input>
                 <el-button type="primary" @click="findGroups">查找</el-button>
             </div>
             <template #footer v-if="showResult">
@@ -33,8 +35,6 @@
 import FindFriend from '../friend/FindFriend.vue';
 import FindGroup from '../group/FindGroup.vue';
 import { ref, computed, getCurrentInstance } from 'vue';
-import { Search } from '@element-plus/icons-vue';
-import { ElMessage } from 'element-plus';
 const emit = defineEmits(['showSearchPart'])
 const dialogVisible = ref(true), showResult = ref(false), searchCondition = ref(''), searchResult = ref([]), partChange = ref(true)
 const { proxy } = getCurrentInstance()
@@ -46,7 +46,7 @@ const closeSearchCard = () => {
 const inquireAbout = async () => {
     if (!searchCondition.value) return ElMessage.info('请先填写查询条件!')
     const res = await proxy.$api.search.searchPeople({ searchCondition: searchCondition.value })
-    proxy.$prompt('查询', res.status)
+    if (res.status !== 200) return ElMessage.error('查询失败!')
     showResult.value = true
     searchResult.value = []
     if (res.message instanceof Array) searchResult.value.push(...res.message)
@@ -55,6 +55,7 @@ const inquireAbout = async () => {
 const findGroups = async () => {
     if (!searchCondition.value) return ElMessage.info('请先填写查询条件!')
     const res = await proxy.$api.search.searchGroup({ searchCondition: searchCondition.value })
+    if (res.status !== 200) return ElMessage.error('查询失败!')
     showResult.value = true
     searchResult.value = []
     console.log(res.message);

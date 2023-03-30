@@ -5,9 +5,9 @@
             <span class="group-name">
                 {{ item.groupName }}
             </span>
-            <span class="group-nums">
+            <span class="group-nums" v-if="!search">
                 <el-icon>
-                    <UserFilled />
+                    <i-ep-UserFilled></i-ep-UserFilled>
                 </el-icon>
                 {{ item.groupMembers.length }}
             </span>
@@ -19,32 +19,30 @@
 
 <script setup>
 import router from '@/router';
-import $axios from '@/api';
+import { getCurrentInstance } from 'vue';
 import { groupChatInfoStore } from '@/store/groupChat';
 import { chatWindowStore } from '@/store/chatWindowStore'
-import { UserFilled } from '@element-plus/icons-vue';
 import { navInfoStore } from '@/store/navStore';
-import { ElMessage } from 'element-plus';
 const groupChatStore = groupChatInfoStore()
 const windowStore = chatWindowStore()
 const navStore = navInfoStore()
+const { proxy } = getCurrentInstance()
 const props = defineProps({ item: Object, search: Boolean })
 const emit = defineEmits(['closeSearchCard'])
 const joinGroup = async () => {
-    const { data: res } = await $axios.post('groupChat/join', { gid: props.item.gid })
+    const res = await proxy.$api.groupChat.joinGroup({ gid: props.item.gid })
     if (res.status !== 200) return ElMessage.error(res.message)
     emit('closeSearchCard')
     await groupChatStore.getGroupChatList()
     return ElMessage.success('添加成功!')
 }
-const sendGroupShow = () => {
-    $axios.post('/groupChat/show', { gid: props.item.gid }).then(async res => {
-        if (res.status !== 200) return ElMessage.error('发生了一些错误')
-        router.push('/home/comment')
-        sessionStorage.setItem('chatWay', false)
-        await windowStore.chooseChat(props.item)
-        navStore.changeMenu(0)
-    })
+const sendGroupShow = async () => {
+    const res = await proxy.$api.groupChat.showGroupChat({ gid: props.item.gid })
+    if (res.status !== 200) return ElMessage.error('发生了一些错误')
+    router.push('/home/comment')
+    sessionStorage.setItem('chatWay', false)
+    await windowStore.chooseChat(props.item)
+    navStore.changeMenu(0)
 }
 </script>
 
@@ -52,11 +50,11 @@ const sendGroupShow = () => {
 .search {
     width: 100% !important;
     background-color: #282a37 !important;
-    box-shadow: 0 0 2px 0 #5aa4ff !important;
+    box-shadow: 0 0 0 0 !important;
 
     .avatar {
-        width: 44px !important;
-        height: 44px !important;
+        width: 45px !important;
+        height: 45px !important;
         font-size: 16px !important;
         line-height: 44px !important;
         background-color: #3f90f6 !important;
@@ -68,6 +66,7 @@ const sendGroupShow = () => {
 
     .group-name {
         font-size: 16px !important;
+        margin-bottom: 4px;
     }
 }
 

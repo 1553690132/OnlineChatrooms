@@ -60,7 +60,7 @@ const windowStore = chatWindowStore()
 const groupChatStore = groupChatInfoStore()
 const chatWay = ref(true)
 const timer = setInterval(() => {
-    userStore.getUserInfo()
+    setTimeout(userStore.getUserInfo, 0)
 }, 5000)
 // 异步绑定uid值作为后端判断依据
 onMounted(async () => {
@@ -164,6 +164,7 @@ onUnmounted(() => {
     .chatRight {
         flex: 1;
         padding-right: 30px;
+        min-width: 500px;
 
         .showIcon {
             position: relative;
@@ -200,7 +201,7 @@ onUnmounted(() => {
 
 @media screen and(max-width: 984px) {
     .chatRight {
-        min-width: 465px !important;
+        min-width: 500px !important;
     }
 }
 </style>

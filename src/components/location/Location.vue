@@ -2,16 +2,18 @@
     <div class="map">
         <div class="map-wrapper">
             <div id="allmap"></div>
-            <el-button :icon="Close" circle class="closeBtn" @click="emit('showLocation')" />
-            <el-button :icon="Check" type="success" circle class="sendBtn" @click="emit('sendLocation')"></el-button>
+            <el-button circle class="closeBtn" @click="emit('showLocation')">
+                <i-ep-close></i-ep-close>
+            </el-button>
+            <el-button type="success" circle class="sendBtn" @click="emit('sendLocation')">
+                <i-ep-check></i-ep-check>
+            </el-button>
         </div>
     </div>
 </template>
 <script setup>
 import { getLocations } from '@/tools';
 import { onMounted } from 'vue';
-import { ElButton } from 'element-plus';
-import { Check, Close } from '@element-plus/icons-vue';
 const emit = defineEmits(['showLocation', 'sendLocation'])
 onMounted(() => {
     getLocations("allmap")

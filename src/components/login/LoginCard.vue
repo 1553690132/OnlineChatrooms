@@ -6,7 +6,7 @@
                     <el-input class=" input-text" v-model="InfoForm.username" placeholder="用户名" size="large">
                         <template #prefix>
                             <el-icon>
-                                <User />
+                                <i-ep-user />
                             </el-icon>
                         </template>
                     </el-input>
@@ -15,7 +15,7 @@
                     <el-input class="input-text" v-model="InfoForm.phone" placeholder="手机号" size="large">
                         <template #prefix>
                             <el-icon>
-                                <Iphone />
+                                <i-ep-iphone />
                             </el-icon>
                         </template>
                     </el-input>
@@ -25,7 +25,7 @@
                         size="large">
                         <template #prefix>
                             <el-icon>
-                                <Lock />
+                                <i-ep-lock />
                             </el-icon>
                         </template>
                     </el-input>
@@ -35,7 +35,7 @@
                         size="large">
                         <template #prefix>
                             <el-icon>
-                                <Help />
+                                <i-ep-help />
                             </el-icon>
                         </template>
                         <template #append>
@@ -48,7 +48,7 @@
                         placeholder="设置密码" size="large">
                         <template #prefix>
                             <el-icon>
-                                <Lock />
+                                <i-ep-lock />
                             </el-icon>
                         </template>
                     </el-input>
@@ -81,9 +81,7 @@
 <script setup>
 import router from '@/router';
 import { ref, reactive, getCurrentInstance, computed, watch } from 'vue'
-import { ElMessage } from 'element-plus';
 import socket from '@/tools/socket';
-import { Help } from '@element-plus/icons-vue';
 const props = defineProps({ operate: String })
 const emit = defineEmits(['changePart'])
 const areas = computed(() => { return props.operate == 'reg' ? false : true })
@@ -184,8 +182,8 @@ const getCode = async () => {
     }, 1000);
     timer
     sec.value = 60
-    const res = await proxy.$api.login.gainCode(InfoForm)
-    console.log(res);
+    const res = await proxy.$api.login.gainCode({ phone: InfoForm.phone, operate: props.operate })
+    if (res.status !== 200) return ElMessage.error(res.message)
     return ElMessage.success('请稍等，验证码已发送!')
 }
 </script>

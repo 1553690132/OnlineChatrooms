@@ -24,7 +24,6 @@
 import noticeInfo from './noticeInfo.vue';
 import { userInfoStore } from '@/store/userStore';
 import { onMounted, ref, getCurrentInstance } from 'vue';
-import { ElMessage } from 'element-plus';
 const { proxy } = getCurrentInstance()
 const userStore = userInfoStore()
 const notifications = ref([])
@@ -41,6 +40,8 @@ onMounted(async () => {
 
 <style lang="less" scoped>
 .noticeHome {
+    min-width: 700px;
+
     .notice-title {
         color: #fff;
         padding-left: 10px;

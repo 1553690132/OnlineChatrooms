@@ -20,12 +20,11 @@
     </transition>
 </template>
 <script setup>
+import router from '@/router';
 import { ref, onMounted, getCurrentInstance } from 'vue';
 import { generateRandomColors } from '@/tools/index'
 import { chatWindowStore } from '@/store/chatWindowStore';
 import { clickMenu } from '@/tools/menu';
-import $axios from '@/api';
-import { ElMessage } from 'element-plus';
 const windowStore = chatWindowStore()
 const { proxy } = getCurrentInstance()
 const props = defineProps({ groupChatInfo: Object })
@@ -42,6 +41,8 @@ const hideChat = async () => {
     if (res.status === 200) {
         windowStore.clearStatus()
         isShow.value = false
+        sessionStorage.setItem('chatWay', false)
+        router.go(0)
     }
 }
 const setColor = () => {

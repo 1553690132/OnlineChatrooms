@@ -16,23 +16,23 @@
             </div>
             <div class="other-functions">
                 <el-tooltip v-if="!chatWay" effect="dark" content="邀请加入群聊" placement="bottom">
-                    <MoreFilled @click="invitePeople" />
+                    <i-ep-MoreFilled @click="invitePeople" />
                 </el-tooltip>
                 <el-tooltip effect="dark" content="发送地址" placement="bottom">
-                    <LocationFilled @click="showLocation" />
+                    <i-ep-LocationFilled @click="showLocation" />
                 </el-tooltip>
                 <el-tooltip effect="dark" content="拍照发送" placement="bottom">
-                    <CameraFilled @click="sendCamera" />
+                    <i-ep-CameraFilled @click="sendCamera" />
                 </el-tooltip>
                 <label for="img">
                     <el-tooltip effect="dark" content="发送图片" placement="bottom">
-                        <PictureFilled />
+                        <i-ep-PictureFilled />
                     </el-tooltip>
                 </label>
                 <input type="file" id="img" accept="image/*" @change="sendPicture">
                 <label for="doc">
                     <el-tooltip effect="dark" content="发送文件" placement="bottom">
-                        <UploadFilled />
+                        <i-ep-UploadFilled />
                     </el-tooltip>
                 </label>
                 <input type="file" id="doc" accept="application/*,text/*" @change="sendFile">
@@ -76,7 +76,6 @@ import CreateGroupCard from '@/components/group/CreateGroupCard.vue';
 import Emoji from '@/components/chats/Emoji.vue';
 import { ref, watch, onMounted, reactive, nextTick, computed, getCurrentInstance } from 'vue';
 import { animationScroll } from '@/tools/index'
-import { ElMessage, ElMessageBox } from 'element-plus';
 import { chatWindowStore } from '@/store/chatWindowStore';
 import { userInfoStore } from '@/store/userStore';
 import { loadingStore } from '@/store/lodingStore';
@@ -397,6 +396,17 @@ const invitePeople = () => {
 
         .other-functions {
             margin-top: 20px;
+
+            :deep(.el-icon) {
+                svg {
+                    color: rgb(158, 161, 177);
+                    cursor: pointer;
+                    width: 30px;
+                    height: 30px;
+                    margin-left: 30px;
+                    border: none !important;
+                }
+            }
 
             svg {
                 color: rgb(158, 161, 177);

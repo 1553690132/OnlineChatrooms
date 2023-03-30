@@ -3,8 +3,8 @@
         <img :src="item.headImg" alt="avatar" class="avatar">
         <div class="right-part">
             <span class="nickname">{{ item.nickname }} ({{ item.username }})</span>
-            <span class="sex"><el-icon :class="{ female: sex }">
-                    <Avatar />
+            <span class="sex" v-if="!search"><el-icon :class="{ female: sex }">
+                    <i-ep-avatar></i-ep-avatar>
                 </el-icon> {{ item.location }}</span>
             <button class="addBtn" @click="addFriend" v-if="!search">加好友</button>
             <button class="addBtn" @click="sendMessageToFriend" v-else>去聊天</button>
@@ -15,7 +15,6 @@
 <script setup>
 import router from '@/router';
 import { userInfoStore } from '@/store/userStore';
-import { ElMessage } from 'element-plus';
 import { computed, getCurrentInstance } from 'vue';
 import { friendInfoStore } from '@/store/friendInfo';
 import { navInfoStore } from '@/store/navStore';

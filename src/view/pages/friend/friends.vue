@@ -6,13 +6,18 @@
         <div class="friend-body">
             <div class="friend-left">
                 <div class="search-part">
-                    <el-input v-model.lazy="searchContext" :prefix-icon="Search" placeholder="搜索"
-                        :class="{ actived: isFocus }" clearable @focus="focus" @change="searchFor" @blur="blur"
-                        @clear="closeCard"></el-input>
+                    <el-input v-model.lazy="searchContext" placeholder="搜索" :class="{ actived: isFocus }" clearable
+                        @focus="focus" @change="searchFor" @blur="blur" @clear="closeCard">
+                        <template #prefix>
+                            <el-icon><i-ep-search></i-ep-search></el-icon>
+                        </template>
+                    </el-input>
                     <el-popconfirm title="请选择您的操作" icon="warning" confirm-button-text="加好友/加群" cancel-button-text="创建群聊"
                         cancel-button-type="success" @confirm="showSearchPart" @cancel="showCreateGroup" width="200">
                         <template #reference>
-                            <el-button :icon="Plus" circle />
+                            <el-button circle>
+                                <el-icon><i-ep-plus></i-ep-plus></el-icon>
+                            </el-button>
                         </template>
                     </el-popconfirm>
                 </div>
@@ -30,7 +35,7 @@
                             <span>输入搜索</span>
                         </div>
                         <el-icon>
-                            <Close @click="closeCard" />
+                            <el-icon><i-ep-close @click="closeCard"></i-ep-close></el-icon>
                         </el-icon>
                     </template>
                     <div class="searchResult">
@@ -68,7 +73,6 @@ import FindGroup from '@/components/group/FindGroup.vue';
 import FindFriend from '@/components/friend/FindFriend.vue';
 import SearchCard from '@/components/search/SearchCard.vue';
 import CreateGroupCard from '@/components/group/CreateGroupCard.vue';
-import { Plus, Search } from '@element-plus/icons-vue';
 import { friendListInfoStore } from '@/store/friendList';
 import { friendInfoStore } from '@/store/friendInfo';
 import { groupChatInfoStore } from '@/store/groupChat';
@@ -273,6 +277,10 @@ const closeCard = () => { showSearchArea.value = false }
                 .el-icon {
                     cursor: pointer;
                 }
+            }
+
+            :deep(.el-card__body) {
+                padding: 10px !important;
             }
 
         }

@@ -1,5 +1,4 @@
 import { defineStore } from "pinia"
-import { ElMessage } from "element-plus"
 import api from "@/api/_index"
 
 export const groupChatInfoStore = defineStore('groupChatInfoStore', {

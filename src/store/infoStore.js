@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import $axios from "@/api";
 import api from "@/api/_index";
 
 export const infoStore = defineStore('infoStore', {

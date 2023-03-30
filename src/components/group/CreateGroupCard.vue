@@ -3,8 +3,11 @@
         <el-dialog v-model="dialogVisible" :title="titles" draggable @close="closeCreateCard">
             <div class="dialog-body">
                 <div class="left-part">
-                    <el-input v-model.lazy="searchContext" :prefix-icon="Search" placeholder="搜索" clearable
-                        @change="searchForFriend" @clear="closeSearchCard"></el-input>
+                    <el-input v-model.lazy="searchContext" placeholder="搜索" clearable
+                        @change="searchForFriend" @clear="closeSearchCard">
+                        <el-icon class="el-icon--left">
+                            <i-ep-search></i-ep-search>
+                        </el-icon></el-input>
                     <el-collapse v-if="!searchResultShow">
                         <div class="collapse" v-for="items in friendListStore.groupList" :key="items.groupName">
                             <el-collapse-item :title="items.groupName">
@@ -46,12 +49,10 @@
 <script setup>
 import router from '@/router';
 import GroupCreateFriend from './GroupCreateFriend.vue';
-import { Search } from '@element-plus/icons-vue';
 import { ref, computed, onMounted, getCurrentInstance } from 'vue'
 import { userInfoStore } from '@/store/userStore';
 import { friendListInfoStore } from '@/store/friendList';
 import { chatWindowStore } from '@/store/chatWindowStore';
-import { ElMessage } from 'element-plus';
 const props = defineProps({ invite: Boolean })
 const { proxy } = getCurrentInstance()
 const userStore = userInfoStore()

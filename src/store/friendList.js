@@ -1,5 +1,4 @@
 import { defineStore } from "pinia"
-import { ElMessage } from "element-plus"
 import { userInfoStore } from "./userStore"
 import api from "@/api/_index"
 

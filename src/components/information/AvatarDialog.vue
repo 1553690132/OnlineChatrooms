@@ -30,7 +30,6 @@
 </template>
 
 <script setup>
-import { ElMessage } from 'element-plus';
 import { ref, watch } from 'vue';
 import { drawAvatar, changeAvatarSize } from '@/tools/avatar'
 import axios from 'axios';

@@ -7,8 +7,16 @@
                 <div class="shutter-btn"></div>
             </div>
             <div class="chance-btns" v-show="isSend">
-                <el-button class="sendPhoto" type="success" :icon="Check" circle @click="savePhoto"></el-button>
-                <el-button class="cancel" type="danger" :icon="Delete" circle @click="closeCamera"></el-button>
+                <el-button class="sendPhoto" type="success" circle @click="savePhoto">
+                    <el-icon>
+                        <i-ep-check></i-ep-check>
+                    </el-icon>
+                </el-button>
+                <el-button class="cancel" type="danger" circle @click="closeCamera">
+                    <el-icon>
+                        <i-ep-delete></i-ep-delete>
+                    </el-icon>
+                </el-button>
             </div>
         </div>
     </div>
@@ -16,8 +24,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { turnOnCamera, shutter, download, changePhotoPart } from '@/tools/index'
-import { Check, Delete } from '@element-plus/icons-vue';
-import { ElMessage } from 'element-plus';
 import { userInfoStore } from '@/store/userStore';
 const _video = ref(null), _canvas = ref(null), isSend = ref(false)
 const userStore = userInfoStore()

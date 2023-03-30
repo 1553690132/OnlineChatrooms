@@ -36,7 +36,7 @@
     </div>
 </template>
 <script setup>
-import { onMounted, ref, computed } from 'vue';
+import { ref, computed } from 'vue';
 import { userInfoStore } from '@/store/userStore'
 import { chatWindowStore } from '@/store/chatWindowStore';
 import FileCard from './FileCard.vue';
@@ -54,12 +54,6 @@ const avatar = computed(() => {
     return props.chatWay ? windowStore.chatWindowInfo.headImg : props.item.headImg
 })
 const showTime = ref(false)
-
-onMounted(async () => {
-    if (!props.chatWay) {
-
-    }
-})
 </script>
 <style lang="less" scoped>
 .chat-friend {

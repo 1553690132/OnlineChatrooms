@@ -13,7 +13,9 @@
         </ul>
     </div>
     <el-dialog v-model="dialogVisible" class="insertGroupCard" title="新增分组" width="40%" center>
-        <el-input v-model="divideGroupName" placeholder="输入分组名称" clearable :prefix-icon="HelpFilled"></el-input>
+        <el-input v-model="divideGroupName" placeholder="输入分组名称" clearable>
+            <el-icon class="el-icon--left"><i-ep-HelpFilled></i-ep-HelpFilled></el-icon>
+        </el-input>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="dialogVisible = false">取消</el-button>
@@ -25,11 +27,9 @@
 
 <script setup>
 import CronyCard from '@/components/friend/CronyCard.vue';
-import { HelpFilled } from '@element-plus/icons-vue';
 import { friendListInfoStore } from '@/store/friendList';
 import { ref, onMounted, getCurrentInstance } from 'vue';
 import { clickMenu } from '@/tools/menu';
-import { ElMessage } from 'element-plus';
 const { proxy } = getCurrentInstance()
 const friendListStore = friendListInfoStore()
 const emit = defineEmits(['chooseFriendInfo'])
