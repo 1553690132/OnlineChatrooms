@@ -116,6 +116,8 @@ const updateMsg = async (info) => {
     chatMsg.forEach(e => { if (e.chatType === 1 && e.imgType === 2) thumbnail.push(e.msg) })
     scrollBottom()
 }
+
+
 // 更新群组消息
 const updateGroupMsg = async info => {
     await groupChatStore.getGroupChatList()
@@ -124,6 +126,7 @@ const updateGroupMsg = async info => {
     chatMsg.push(...msgs)
     scrollBottom()
 }
+
 
 onMounted(() => {
     if (props.chatWay) {
@@ -140,7 +143,11 @@ onMounted(() => {
             scrollBottom()
         })
     }
+    socket.on('upFile', async () => {
+        await userStore.getUserInfo()
+    })
 })
+
 
 watch(() => windowStore.chatWindowInfo, () => {
     if (props.chatWay) {
@@ -156,7 +163,7 @@ const chatPart = ref(null) //vue3获取原生dom对象
 const scrollBottom = () => {
     nextTick(() => {
         const chatPartDom = chatPart.value
-        animationScroll(chatPartDom, chatPartDom.scrollHeight - chatPartDom.offsetHeight)
+        if (chatPartDom) animationScroll(chatPartDom, chatPartDom.scrollHeight - chatPartDom.offsetHeight)
     })
 }
 
@@ -193,6 +200,19 @@ const sendMsg = async (msgs, type = '') => {
             'Content-type': 'multipart/form-data'
         })
         if (res.status !== 200) return ElMessage({ type: 'error', message: res.message })
+        if (props.chatWay) {
+            socket.emit('privateChat', {
+                sid: userStore._id,
+                rid: windowStore.chatWindowInfo._id,
+                msg: "file",
+            })
+        } else {
+            socket.emit('groupChat', {
+                sid: userStore._id,
+                rid: windowStore.chatWindowInfo._id,
+                msg: "file"
+            })
+        }
         updateMsg(windowStore.chatWindowInfo)
         userStore.listSort(windowStore.chatWindowInfo._id)
         scrollBottom()
@@ -202,13 +222,12 @@ const sendMsg = async (msgs, type = '') => {
     }
 
     if (props.chatWay) {
+        const res = await proxy.$api.chatMsg.sendMessage({ sid: userStore._id, rid: windowStore.chatWindowInfo._id, chats })
         socket.emit('privateChat', {
             sid: userStore._id,
             rid: windowStore.chatWindowInfo._id,
             msg: chats,
         })
-
-        const res = await proxy.$api.chatMsg.sendMessage({ sid: userStore._id, rid: windowStore.chatWindowInfo._id, chats })
         if (res.status !== 200) return ElMessage({ type: 'error', message: res.message })
         // 发送后重新获取
         updateMsg(windowStore.chatWindowInfo)
@@ -217,12 +236,12 @@ const sendMsg = async (msgs, type = '') => {
         scrollBottom()
     } else {
         chats = JSON.stringify({ ...JSON.parse(chats), headImg: userStore.userImg })
+        const res = await proxy.$api.groupChat.sendGroupMsg({ gid: windowStore.chatWindowInfo._id, message: chats })
         socket.emit('groupChat', {
             sid: userStore._id,
             rid: windowStore.chatWindowInfo._id,
             msg: chats
         })
-        const res = await proxy.$api.groupChat.sendGroupMsg({ gid: windowStore.chatWindowInfo._id, message: chats })
         if (res.status !== 200) return ElMessage.error('fail!')
         updateGroupMsg(windowStore.chatWindowInfo.gid)
         scrollBottom()

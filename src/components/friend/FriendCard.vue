@@ -23,6 +23,7 @@
 </template>
 <script setup>
 import moment from 'moment'
+import router from '@/router';
 import { ref, onMounted, computed, getCurrentInstance } from 'vue';
 import { chatWindowStore } from '@/store/chatWindowStore';
 import { clickMenu } from '@/tools/menu'
@@ -44,6 +45,7 @@ const deleteChat = async () => {
     if (res.status === 200) {
         windowStore.clearStatus()
         isShow.value = false
+        router.go(0)
     }
 }
 const hideChat = async () => {
@@ -51,6 +53,7 @@ const hideChat = async () => {
     if (res.status === 200) {
         windowStore.clearStatus()
         isShow.value = false
+        router.go(0)
     }
 }
 </script>

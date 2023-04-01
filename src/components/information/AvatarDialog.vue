@@ -32,9 +32,11 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { drawAvatar, changeAvatarSize } from '@/tools/avatar'
+import { userInfoStore } from '@/store/userStore';
 import axios from 'axios';
 const emit = defineEmits(['changeDialog', 'showAvatarConfig'])
 const props = defineProps({ avatarUrl: String })
+const userStore = userInfoStore()
 const isCanvasShow = ref(false), dialogVisible = ref(true)
 const measurement = ref(0), canvas_avatar = ref(null), canvas_show_avatar = ref(null), drawPanel = ref(null)
 watch(() => measurement.value, () => {
@@ -55,6 +57,7 @@ const updateAvatar = async () => {
     formData.append('avatar_url', avatar_url)
     const { data: res } = await axios.post('info/updateAvatar', formData, { 'Content-type': 'multipart/form-data' })
     if (res.status !== 200) return ElMessage.error('更新失败!')
+    await userStore.getUserInfo()
     return ElMessage.success('更新成功')
 }
 </script>

@@ -3,14 +3,12 @@ const Home = () => import(/* webpackChunkName: "chatroom-index" */'@/view/home.v
 const Comment = () => import(/* webpackChunkName: "chatroom-index" */'@/view/pages/comment/comment.vue')
 const Notice = () => import(/* webpackChunkName: "chatroom-index" */'@/view/pages/notice/notice.vue')
 const Friends = () => import(/* webpackChunkName: "chatroom-index" */'@/view/pages/friend/friends.vue')
-
-// import Comment from "../view/pages/comment/comment.vue";
 // import Friends from "../view/pages/friend/friends.vue";
 // import Notice from '@/view/pages/notice/notice.vue';
 // import Login from '../view/Login.vue';
 // import Home from "@/view/home.vue";
 
-import { createRouter, createWebHistory } from "vue-router"
+import { createRouter, createWebHashHistory, createWebHistory } from "vue-router"
 
 const router = createRouter({
     routes: [
@@ -54,7 +52,7 @@ const router = createRouter({
             ]
         },
     ],
-    history: createWebHistory()
+    history: createWebHashHistory()
 })
 
 

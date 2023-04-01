@@ -47,7 +47,6 @@ const beforeHandler = () => {
 const unloadHandler = () => {
     gap_times.value = new Date().getTime() - times.value
     if (gap_times.value <= 5) {
-        console.log(123);
         sendBreakage()
     }
 }

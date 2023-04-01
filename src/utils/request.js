@@ -4,7 +4,7 @@ import 'nprogress/nprogress.css'
 
 
 axios.defaults.timeout = 300000000
-axios.defaults.baseURL = "http://localhost:3007/"
+axios.defaults.baseURL = "http://43.143.232.169:8890/"
 // 跨域携带cookie信息
 axios.defaults.withCredentials = true
 

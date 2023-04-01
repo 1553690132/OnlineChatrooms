@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import FriendCard from '@/components/friend/FriendCard.vue'
 import chatWindow from './chatWindow.vue'
 import GroupCard from '@/components/group/GroupCard.vue'
@@ -59,9 +59,26 @@ const userStore = userInfoStore()
 const windowStore = chatWindowStore()
 const groupChatStore = groupChatInfoStore()
 const chatWay = ref(true)
-const timer = setInterval(() => {
-    setTimeout(userStore.getUserInfo, 0)
-}, 5000)
+const timers = setInterval(async () => {
+    setTimeout(async () => {
+        socket.emit('heartbeat', userStore._id)
+        socket.on('friendOnline', async () => {
+            await userStore.getUserInfo()
+        })
+    }, 0)
+}, 5000);
+const _timers = setInterval(() => {
+    setTimeout(() => {
+        socket.once('upList', upList)
+    });
+    socket.removeAllListeners('upList')
+});
+
+const upList = async () => {
+    await userStore.getUserInfo()
+    socket.removeAllListeners('upList')
+}
+
 // 异步绑定uid值作为后端判断依据
 onMounted(async () => {
     if (sessionStorage.getItem('chatWay')) {
@@ -70,16 +87,17 @@ onMounted(async () => {
     }
     await userStore.getUserInfo()
     await groupChatStore.getGroupChatList()
+    const _id = await userStore.getUserInfo()
     socket.on('connect', async () => {
-        const _id = await userStore.getUserInfo()
         socket.emit('logins', _id)
     })
-    timer
+    socket.emit('logins', _id)
 })
 
 onUnmounted(() => {
     windowStore.clearStatus()
-    clearInterval(timer)
+    clearInterval(timers)
+    clearInterval(_timers)
 })
 
 

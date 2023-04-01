@@ -15,7 +15,6 @@ export const userInfoStore = defineStore('userInfoStore', {
     },
     actions: {
         async getUserInfo() {
-
             try {
                 const res = await api.userInfo.getUserInfos()
                 if (res.status !== 200) return ElMessage({ type: 'error', message: '获取失败!' })
